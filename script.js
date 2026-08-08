@@ -2822,7 +2822,6 @@ async function refreshDataCloud(){
         updateGrafikPenyerapan();
         updateDashboardNominal();
 
-        alert("✅ Data berhasil diperbarui dari Cloud.");
 
     }catch(err){
 
