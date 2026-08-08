@@ -1456,3 +1456,12 @@ align-items:center;
     height:100%;
 
 }
+setInterval(function(){
+
+    if(localStorage.getItem("login")=="true"){
+
+        refreshDataCloud();
+
+    }
+
+},5000);
