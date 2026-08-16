@@ -601,7 +601,7 @@ style="display:none;">
                     <th width="220">Program</th>
                     <th width="260">Sub Kegiatan</th>
                     <th width="120">Target</th>
-                     <th width="120">Indikator</th>
+                    <th width="120">Indikator</th>
                     <th width="170">Pagu</th>
                     <th width="120">Status</th>
                     <th width="120">Kelola</th>
@@ -617,165 +617,136 @@ style="display:none;">
         </table>
 
     </div>
-   <div class="realisasi-form" id="panelInput">
+    <div
+    class="realisasi-form"
+    id="panelInput"
+    style="display:none;">
 
-<h3>📝 Form Input Realisasi</h3>
+    <h3>📝 Form Input Realisasi</h3>
 
-<hr>
+    <hr>
 
-<div class="form-group">
+    <div class="form-group">
 
-<label>Program</label>
+        <label>Program</label>
 
-<input
-type="text"
-id="formProgram"
-readonly>
+        <input
+            type="text"
+            id="formProgram"
+            readonly>
 
-</div>
+    </div>
 
-<div class="form-group">
 
-<label>Sub Kegiatan</label>
+    <div class="form-group">
 
-<input
-type="text"
-id="formSubKegiatan"
-readonly>
+        <label>Sub Kegiatan</label>
 
-</div>
+        <input
+            type="text"
+            id="formSubKegiatan"
+            readonly>
 
-<div class="form-group">
+    </div>
 
-<label>Indikator</label>
 
-<input
-type="text"
-id="formIndikator"
-readonly>
+    <div class="form-group">
 
-</div>
+        <label>Indikator</label>
 
-<div class="form-group">
+        <input
+            type="text"
+            id="formIndikator"
+            readonly>
 
-<label>Target Kinerja</label>
+    </div>
 
-<input
-type="text"
-id="formTarget"
-readonly>
 
-</div>
+    <div class="form-group">
 
-<div class="form-group">
+        <label>Target Kinerja</label>
 
-<label>Triwulan</label>
+        <input
+            type="text"
+            id="formTarget"
+            readonly>
 
-<select id="formTW" onchange="loadPanelTW()">
+    </div>
 
-<option value="1">Triwulan I</option>
 
-<option value="2">Triwulan II</option>
+    <!-- PERIODE -->
 
-<option value="3">Triwulan III</option>
+    <div class="form-group">
 
-<option value="4">Triwulan IV</option>
+        <label>Periode Realisasi</label>
 
-</select>
+        <div style="
+            padding:12px;
+            background:#eef6ff;
+            border-radius:8px;
+            color:#2563eb;
+            font-size:14px;
+        ">
+            Seluruh data Triwulan I sampai IV
+            ditampilkan dalam satu panel.
+        </div>
 
-</div>
-<hr>
+    </div>
 
-<h4>💰 Realisasi Anggaran</h4>
 
-<div class="form-group">
+    <hr>
 
-<label>Angkas</label>
 
-<input
-type="text"
-id="formAngkas"
-onkeyup="formatRupiah(this); hitungPersentasePanel()">
-</div>
+    <!-- URAIAN -->
 
-<div class="form-group">
+   <div id="daftarUraian" style="margin-top:20px;"></div>
 
-<label>Realisasi Anggaran</label>
-
-<input
-type="text"
-id="formRealisasi"
-onkeyup="formatRupiah(this); hitungPersentasePanel()">
-</div>
-
-<hr>
-
-<h4>📈 Realisasi Kinerja</h4>
-
-<div class="form-group">
-
-<label>Realisasi Kinerja</label>
-
-<input
-type="text"
-id="formRealisasiKinerja"
-onkeyup="hitungPersentasePanel()">
-</div>
-<hr>
-
-<div class="persen-box">
-
-    <p>
-
-        <b>Persentase Anggaran</b>
-
-        <span id="persenAnggaranForm">
-
-            0%
-
-        </span>
-
-    </p>
-
-    <p>
-
-        <b>Persentase Kinerja</b>
-
-        <span id="persenKinerjaForm">
-
-            0%
-
-        </span>
-
-    </p>
-
-</div>
-<hr>
+<div id="totalUraian"></div>
 
 <button
-id="btnSimpanPanel"
-class="btn-kelola"
-onclick="simpanPanel()">
+    type="button"
+    onclick="tambahUraian()"
+    style="margin-top:10px;">
 
-💾 Simpan Realisasi
+    + Tambah Uraian
 
 </button>
 
-<p
-style="
-text-align:center;
-color:#999;
+<hr>
+
+<button
+    id="btnSimpanPanel"
+    class="btn-kelola"
+    onclick="simpanPanel()">
+
+    💾 Simpan Realisasi
+
+</button>
+<button
+    type="button"
+    class="btn-kembali"
+    onclick="tutupPanelInput()">
+
+    ← Kembali ke Daftar
+
+</button>
+
+
+<p style="
+    text-align:center;
+    color:#999;
 ">
 
-Silakan klik tombol
-<b>Kelola</b>
-pada tabel.
+    Silakan klik tombol
+    <b>Kelola</b>
+    pada tabel.
 
-</p>
 
-</div>
+</div> <!-- tutup panelInput -->
 
-</div>
+</div> <!-- tutup realisasi-container -->
+
+</div> <!-- tutup realisasiTriwulan -->
 <!-- ================= MODAL KELOLA REALISASI ================= -->
 <div id="modalKelola" class="modal">
 
@@ -789,151 +760,47 @@ pada tabel.
 
         </div>
 
-       <!-- INFORMASI -->
-
-<div id="judulSubKegiatan" class="info-card"></div>
-
-<!-- PILIH TRIWULAN -->
-
-<div class="form-group">
-
-    <label>Pilih Triwulan</label>
-
-    <select id="pilihTW" onchange="loadDataTriwulan()">
-
-        <option value="1">Triwulan I</option>
-        <option value="2">Triwulan II</option>
-        <option value="3">Triwulan III</option>
-        <option value="4">Triwulan IV</option>
-
-    </select>
-
-</div>
-<hr>
-<!-- ANGGARAN -->
-
-<div class="input-card">
-
-    <h3>💰 Realisasi Anggaran</h3>
-
-    <label>Angkas</label>
-
-    <input
-        type="text"
-        id="modalAngkas"
-        placeholder="Masukkan Angkas"
-        onkeyup="formatRupiah(this)">
-
-    <label>Realisasi Anggaran</label>
-
-    <input
-        type="text"
-        id="modalRealisasi"
-        placeholder="Masukkan Realisasi"
-        onkeyup="formatRupiah(this)">
-
-</div>
-
-<!-- KINERJA -->
-
-<div class="input-card">
-
-    <h3>📈 Realisasi Kinerja</h3>
-
-    <label>Target Kinerja</label>
-
-    <input
-        type="text"
-        id="modalTarget"
-        placeholder="Contoh : 8 Dokumen">
-
-    <label>Realisasi Kinerja</label>
-
-    <input
-        type="text"
-        id="modalKinerja"
-        placeholder="Contoh : 6 Dokumen">
-
-</div>
-
-<!-- PERSENTASE -->
-
-<div class="persen-box">
-
-    <div>
-
-        Persentase Anggaran
-
-        <strong id="persenAnggaranModal">
-
-            0%
-
-        </strong>
-
-    </div>
-
-    <br>
-
-    <div>
-
-        Persentase Kinerja
-
-        <strong id="persenKinerjaModal">
-
-            0%
-
-        </strong>
-
     </div>
 
 </div>
 
-<button
-id="btnSimpanModal"
-class="btn-kelola"
-onclick="simpanKelola()">
-
-💾 Simpan Perubahan
-
-</button>            </div>
-
-        </div>
-
-    </div>
-</div>
 <!-- ================= END MENU PERENCANAAN ================= -->
-<div id="monitoring" style="display:none;">
+</div>
 
-<h1>📊 Monitoring Realisasi</h1>
 
-<table id="tabelMonitoring">
-<thead>
+<!-- ================= MONITORING ================= -->
 
-<tr>
+<div
+    id="monitoring"
+    style="display:none;">
+    <h1>📊 Monitoring Realisasi</h1>
 
-<th>No</th>
-<th>Program</th>
-<th>Kegiatan</th>
-<th>Sub Kegiatan</th>
-<th>Pagu</th>
+    <table id="tabelMonitoring">
 
-<th>TW I</th>
-<th>TW II</th>
-<th>TW III</th>
-<th>TW IV</th>
+        <thead>
+            <tr>
 
-<th>Status</th>
+                <th>No</th>
+                <th>Program</th>
+                <th>Kegiatan</th>
+                <th>Sub Kegiatan</th>
+                <th>Pagu</th>
 
-<th>Detail</th>
+                <th>TW I</th>
+                <th>TW II</th>
+                <th>TW III</th>
+                <th>TW IV</th>
 
-</tr>
+                <th>Status</th>
+                <th>Detail</th>
 
-</thead>
-<tbody>
+            </tr>
+        </thead>
 
-</tbody>
+        <tbody>
+        </tbody>
 
-</table>
+    </table>
 
 </div>
 <div id="laporan" style="display:none;">
