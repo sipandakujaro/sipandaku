@@ -115,8 +115,7 @@ document.getElementById("dashboardPage")
 document.getElementById("loginPage")
 .style.display="flex";
 
-}
-function showPage(page){
+}function showPage(page){
 
     const pages = [
         "dashboard",
@@ -146,6 +145,13 @@ function showPage(page){
     if(page == "monitoring"){
 
         tampilkanMonitoring();
+
+    }
+
+
+    if(page == "dokumen"){
+
+        tampilkanDokumen();
 
     }
 
@@ -499,21 +505,38 @@ if(persen){
 persen.innerHTML =
 rata + "%";
 
-}
-let baik = 0;
+}let baik = 0;
 let berjalan = 0;
 let belum = 0;
 
-data.forEach(item=>{
 
-    let progres = Math.max(
+data.forEach(item => {
 
-        Number(item.persen1 || 0),
-        Number(item.persen2 || 0),
-        Number(item.persen3 || 0),
-        Number(item.persen4 || 0)
+    let progres = 0;
 
-    );
+    let daftarUraian =
+        item.uraian || [];
+
+
+    daftarUraian.forEach(uraian => {
+
+        for(let tw = 1; tw <= 4; tw++){
+
+            let persen =
+                Number(
+                    uraian["tw" + tw]?.persen || 0
+                );
+
+            progres =
+                Math.max(
+                    progres,
+                    persen
+                );
+
+        }
+
+    });
+
 
     if(progres >= 100){
 
@@ -559,80 +582,177 @@ document.getElementById(
 "Rp " +
 totalAnggaran.toLocaleString("id-ID");
 }
-let totalTW1 = 0;
-let totalTW2 = 0;
-let totalTW3 = 0;
-let totalTW4 = 0;
+// =====================================
+// HITUNG DASHBOARD DARI DATA URAIAN
+// =====================================
+
+let totalAngkasTW1 = 0;
+let totalAngkasTW2 = 0;
+let totalAngkasTW3 = 0;
+let totalAngkasTW4 = 0;
 
 let totalNominalTW1 = 0;
 let totalNominalTW2 = 0;
 let totalNominalTW3 = 0;
 let totalNominalTW4 = 0;
 
-data.forEach(item=>{
 
-    totalTW1 += Number(item.tw1 || 0);
-    totalTW2 += Number(item.tw2 || 0);
-    totalTW3 += Number(item.tw3 || 0);
-    totalTW4 += Number(item.tw4 || 0);
+// =====================================
+// LOOP DATA SUB KEGIATAN
+// =====================================
 
-    totalNominalTW1 += Number(item.realisasi1 || 0);
-    totalNominalTW2 += Number(item.realisasi2 || 0);
-    totalNominalTW3 += Number(item.realisasi3 || 0);
-    totalNominalTW4 += Number(item.realisasi4 || 0);
+data.forEach(item => {
+
+    let daftarUraian =
+        item.uraian || [];
+
+
+    daftarUraian.forEach(uraian => {
+
+        // ==============================
+        // TW I
+        // ==============================
+
+        totalAngkasTW1 += Number(
+            uraian.tw1?.angkas || 0
+        );
+
+        totalNominalTW1 += Number(
+            uraian.tw1?.realisasi || 0
+        );
+
+
+        // ==============================
+        // TW II
+        // ==============================
+
+        totalAngkasTW2 += Number(
+            uraian.tw2?.angkas || 0
+        );
+
+        totalNominalTW2 += Number(
+            uraian.tw2?.realisasi || 0
+        );
+
+
+        // ==============================
+        // TW III
+        // ==============================
+
+        totalAngkasTW3 += Number(
+            uraian.tw3?.angkas || 0
+        );
+
+        totalNominalTW3 += Number(
+            uraian.tw3?.realisasi || 0
+        );
+
+
+        // ==============================
+        // TW IV
+        // ==============================
+
+        totalAngkasTW4 += Number(
+            uraian.tw4?.angkas || 0
+        );
+
+        totalNominalTW4 += Number(
+            uraian.tw4?.realisasi || 0
+        );
+
+    });
+
 });
+
+
+// =====================================
+// HITUNG PERSENTASE
+// =====================================
+
 let rataTW1 =
-data.length ?
-Math.round(totalTW1/data.length)
-: 0;
+    totalAngkasTW1 > 0
+        ? Math.round(
+            (totalNominalTW1 /
+             totalAngkasTW1) * 100
+        )
+        : 0;
+
 
 let rataTW2 =
-data.length ?
-Math.round(totalTW2/data.length)
-: 0;
+    totalAngkasTW2 > 0
+        ? Math.round(
+            (totalNominalTW2 /
+             totalAngkasTW2) * 100
+        )
+        : 0;
+
 
 let rataTW3 =
-data.length ?
-Math.round(totalTW3/data.length)
-: 0;
+    totalAngkasTW3 > 0
+        ? Math.round(
+            (totalNominalTW3 /
+             totalAngkasTW3) * 100
+        )
+        : 0;
+
 
 let rataTW4 =
-data.length ?
-Math.round(totalTW4/data.length)
-: 0;updateGrafik();
+    totalAngkasTW4 > 0
+        ? Math.round(
+            (totalNominalTW4 /
+             totalAngkasTW4) * 100
+        )
+        : 0;
 
-updateGrafikAnggaran();
 
-updateGrafikTriwulan();
+// =====================================
+// UPDATE PERSENTASE DASHBOARD
+// =====================================
 
-updateGrafikPenyerapan();
-
-tampilkanMonitoring();
-
-tampilkanLaporan();
 if(document.getElementById("tw1Persen")){
 
-    document.getElementById("tw1Persen").innerHTML = rataTW1 + "%";
-    document.getElementById("tw2Persen").innerHTML = rataTW2 + "%";
-    document.getElementById("tw3Persen").innerHTML = rataTW3 + "%";
-    document.getElementById("tw4Persen").innerHTML = rataTW4 + "%";
+    document.getElementById("tw1Persen").innerHTML =
+        rataTW1 + "%";
+
+    document.getElementById("tw2Persen").innerHTML =
+        rataTW2 + "%";
+
+    document.getElementById("tw3Persen").innerHTML =
+        rataTW3 + "%";
+
+    document.getElementById("tw4Persen").innerHTML =
+        rataTW4 + "%";
 
 }
 
+
+// =====================================
+// UPDATE NOMINAL DASHBOARD
+// =====================================
+
 if(document.getElementById("tw1Nominal")){
 
-document.getElementById("tw1Nominal").innerHTML =
-"Rp " + totalNominalTW1.toLocaleString("id-ID");
+    document.getElementById("tw1Nominal").innerHTML =
+        "Rp " +
+        totalNominalTW1.toLocaleString("id-ID");
 
-document.getElementById("tw2Nominal").innerHTML =
-"Rp " + totalNominalTW2.toLocaleString("id-ID");
 
-document.getElementById("tw3Nominal").innerHTML =
-"Rp " + totalNominalTW3.toLocaleString("id-ID");
+    document.getElementById("tw2Nominal").innerHTML =
+        "Rp " +
+        totalNominalTW2.toLocaleString("id-ID");
 
-document.getElementById("tw4Nominal").innerHTML =
-"Rp " + totalNominalTW4.toLocaleString("id-ID");
-}}
+
+    document.getElementById("tw3Nominal").innerHTML =
+        "Rp " +
+        totalNominalTW3.toLocaleString("id-ID");
+
+
+    document.getElementById("tw4Nominal").innerHTML =
+        "Rp " +
+        totalNominalTW4.toLocaleString("id-ID");
+
+}
+}
 function hapusData(){
 
 if(confirm(
@@ -699,7 +819,8 @@ function updateGrafik(){
     });
 
 
-}function tampilkanMonitoring(){
+}
+function tampilkanMonitoring(){
 
     let data =
         JSON.parse(localStorage.getItem("data")) || [];
@@ -1063,96 +1184,307 @@ function tutupMonitoring(){
 
 document.getElementById("modalMonitoring").style.display="none";
 
+}function uploadDokumen(){
+
+    let input =
+        document.getElementById("uploadDokumen");
+
+    let file =
+        input.files[0];
+
+
+    // =========================
+    // CEK FILE
+    // =========================
+
+    if(!file){
+
+        alert(
+            "Pilih file terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+
+    let jenis =
+        document.getElementById(
+            "jenisDokumen"
+        ).value;
+
+
+    // =========================
+    // BACA FILE
+    // =========================
+
+    let reader =
+        new FileReader();
+
+
+    reader.onload = function(e){
+
+        let base64 =
+            e.target.result.split(",")[1];
+
+
+        // =========================
+        // DATA YANG DIKIRIM
+        // =========================
+
+        let data = {
+
+            action:
+                "uploadDokumen",
+
+            jenis:
+                jenis,
+
+            namaFile:
+                file.name,
+
+            mimeType:
+                file.type,
+
+            fileData:
+                base64
+
+        };
+
+
+        // =========================
+        // KIRIM KE GOOGLE APPS SCRIPT
+        // =========================
+
+        fetch(
+            "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec",
+            {
+
+                method: "POST",
+
+                body:
+                    JSON.stringify(data)
+
+            }
+        )
+
+        .then(response =>
+            response.json()
+        )
+
+        .then(result => {
+
+            if(result.success){
+
+                alert(
+                    "✅ Dokumen berhasil diupload ke Google Drive."
+                );
+
+                input.value = "";
+
+                tampilkanDokumen();
+
+            }else{
+
+                alert(
+                    "❌ Upload gagal:\n" +
+                    result.message
+                );
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert(
+                "❌ Terjadi kesalahan saat upload."
+            );
+
+        });
+
+    };
+
+
+    // =========================
+    // MULAI BACA FILE
+    // =========================
+
+    reader.readAsDataURL(file);
+
 }
-function uploadDokumen(){
+function tampilkanDokumen(){
 
-let file =
-document.getElementById(
-"uploadDokumen"
-).files[0];
+    const url =
+        "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec?type=dokumen";
 
-if(!file){
 
-alert(
-"Pilih file terlebih dahulu"
-);
+    fetch(url)
 
-return;
+        .then(response => response.json())
+
+        .then(data => {
+
+            const tbody =
+                document.querySelector(
+                    "#tabelDokumen tbody"
+                );
+
+            if(!tbody) return;
+
+            tbody.innerHTML = "";
+
+
+            data.forEach((item,index) => {
+
+                tbody.innerHTML += `
+
+                    <tr>
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td>
+                            ${item.jenis || "-"}
+                        </td>
+
+                        <td>
+                            ${item.nama || "-"}
+                        </td>
+
+                        <td>
+
+                            <button
+                                onclick="
+                                    window.open(
+                                        '${item.url}',
+                                        '_blank'
+                                    );
+                                "
+                            >
+                                👁️ Lihat
+                            </button>
+
+
+                            <button
+                                onclick="
+                                    hapusDokumen(
+                                        '${item.id}'
+                                    );
+                                "
+                                style="
+                                    margin-left:5px;
+                                    background:#dc2626;
+                                    color:white;
+                                "
+                            >
+                                🗑️ Hapus
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            });
+
+
+            const total =
+                document.getElementById(
+                    "totalDokumen"
+                );
+
+            if(total){
+
+                total.innerHTML =
+                    data.length;
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Gagal mengambil dokumen:",
+                error
+            );
+
+        });
 
 }
+function hapusDokumen(id){
 
-let jenis =
-document.getElementById(
-"jenisDokumen"
-).value;
+    if(!confirm(
+        "Yakin ingin menghapus dokumen ini?"
+    )){
+        return;
+    }
 
-let dokumen =
-JSON.parse(
-localStorage.getItem(
-"dokumen"
-)
-) || [];
+    const data = {
 
-dokumen.push({
+        action: "hapusDokumen",
 
-jenis,
-nama:file.name
+        id: id
 
-});
+    };
 
-localStorage.setItem(
-"dokumen",
-JSON.stringify(dokumen)
-);
+    fetch(
+        "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec",
+        {
+            method:"POST",
 
-tampilkanDokumen();
+            headers:{
+                "Content-Type":
+                    "text/plain;charset=utf-8"
+            },
 
-alert(
-"Dokumen berhasil diupload"
-);
+            body:
+                JSON.stringify(data)
+        }
+    )
 
-}function tampilkanDokumen(){
+    .then(response =>
+        response.json()
+    )
 
-let data =
-JSON.parse(
-localStorage.getItem(
-"dokumen"
-)
-) || [];
+    .then(result => {
 
-let tbody =
-document.querySelector(
-"#tabelDokumen tbody"
-);
+        if(result.success){
 
-if(!tbody) return;
+            alert(
+                "✅ Dokumen berhasil dihapus."
+            );
 
-tbody.innerHTML="";
+            tampilkanDokumen();
 
-data.forEach((item,index)=>{
+        }else{
 
-tbody.innerHTML += `
+            alert(
+                "❌ Gagal menghapus dokumen:\n" +
+                result.message
+            );
 
-<tr>
+        }
 
-<td>${index+1}</td>
+    })
 
-<td>${item.jenis}</td>
+    .catch(error => {
 
-<td>${item.nama}</td>
+        console.error(error);
 
-</tr>
+        alert(
+            "❌ Terjadi kesalahan saat menghapus dokumen."
+        );
 
-`;
+    });
 
-});
-
-document.getElementById(
-"totalDokumen"
-).innerHTML =
-data.length;
-
-}function exportExcel(){
+}
+function exportExcel(){
 
 let data =
 JSON.parse(
@@ -1198,116 +1530,118 @@ localStorage.getItem("data")
 let totalAnggaran = 0;
 let totalRealisasi = 0;
 
+
 data.forEach((item,index)=>{
 
-totalAnggaran +=
-Number(item.anggaran || 0);
+    // ==============================
+    // TOTAL PAGU
+    // ==============================
 
-totalRealisasi +=
-Number(item.realisasi1 || 0);
+    totalAnggaran += Number(
+        item.anggaran || 0
+    );
 
-totalRealisasi +=
-Number(item.realisasi2 || 0);
 
-totalRealisasi +=
-Number(item.realisasi3 || 0);
+    // ==============================
+    // TOTAL REALISASI DARI URAIAN
+    // ==============================
 
-totalRealisasi +=
-Number(item.realisasi4 || 0);
+    let daftarUraian =
+        item.uraian || [];
+
+
+    daftarUraian.forEach(uraian => {
+
+        totalRealisasi += Number(
+            uraian.tw1?.realisasi || 0
+        );
+
+        totalRealisasi += Number(
+            uraian.tw2?.realisasi || 0
+        );
+
+        totalRealisasi += Number(
+            uraian.tw3?.realisasi || 0
+        );
+
+        totalRealisasi += Number(
+            uraian.tw4?.realisasi || 0
+        );
+
+    });
+
+
+    // ==============================
+    // TABEL DATA PERENCANAAN
+    // ==============================
+
+    if(tbody){
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td class="kolom-pilih">
+                    <div class="checkbox-wrapper">
+
+                        <input
+                            type="checkbox"
+                            class="cekHapus"
+                            value="${index}"
+                            title="Pilih data ini"
+                            onclick="
+                                pilihData(${index});
+                                event.stopPropagation();
+                            ">
+
+                    </div>
+                </td>
+
+                <td>
+                    ${index + 1}
+                </td>
+
+                <td>
+                    ${item.program || "-"}
+                </td>
+
+                <td>
+                    ${item.kegiatan || "-"}
+                </td>
+
+                <td>
+                    ${item.subKegiatan || "-"}
+                </td>
+
+                <td>
+                    ${item.indikator || "-"}
+                </td>
+
+                <td>
+                    ${item.target || "-"}
+                </td>
+
+                <td>
+                    Rp ${
+                        Number(
+                            item.anggaran || 0
+                        ).toLocaleString("id-ID")
+                    }
+                </td>
+
+                <td>
+                    ${item.penanggungJawab || ""}
+                </td>
+
+                <td>
+                    ${item.status || ""}
+                </td>
+
+            </tr>
+        `;
+
+    }
 
 });
-
-let rata = 0;
-
-if(data.length > 0){
-
-rata =
-Math.round(
-totalRealisasi / data.length
-);
-
-}
-
-doc.setFontSize(16);
-
-doc.text(
-"PEMERINTAH KABUPATEN TABALONG",
-105,
-15,
-{align:"center"}
-);
-
-doc.text(
-"KECAMATAN JARO",
-105,
-25,
-{align:"center"}
-);
-
-doc.setFontSize(11);
-
-doc.text(
-"LAPORAN TRIWULAN SIPANDAKU",
-105,
-35,
-{align:"center"}
-);
-
-doc.line(
-20,
-40,
-190,
-40
-);
-
-let y = 55;
-
-doc.text(
-"Ringkasan Kinerja",
-20,
-y
-);
-
-y += 10;
-
-let jumlahProgram =
-new Set(
-data.map(item=>item.program)
-).size;
-
-doc.text(
-"Total Program : " + jumlahProgram,
-20,
-y
-);
-y += 10;
-
-doc.text(
-"Total Anggaran : Rp " +
-totalAnggaran.toLocaleString("id-ID"),
-20,
-y
-);
-
-y += 10;
-
-doc.text(
-"Rata-rata Realisasi : " +
-rata + "%",
-20,
-y
-);
-
-y += 20;
-
-doc.text(
-"Daftar Program",
-20,
-y
-);
-
-y += 10;
-
 data.forEach((item,index)=>{
 
 doc.text(
@@ -1586,225 +1920,480 @@ max:100
 
 }
 let chartTriwulan;
-
 function updateGrafikTriwulan(){
+    let data =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
 
-let data =
-JSON.parse(
-localStorage.getItem("data")
-) || [];
 
-let totalRealisasi = 0;
+    let totalAngkasTW1 = 0;
+    let totalAngkasTW2 = 0;
+    let totalAngkasTW3 = 0;
+    let totalAngkasTW4 = 0;
 
-data.forEach(item=>{
 
-totalRealisasi +=
-Number(item.realisasi || 0);
+    let totalRealisasiTW1 = 0;
+    let totalRealisasiTW2 = 0;
+    let totalRealisasiTW3 = 0;
+    let totalRealisasiTW4 = 0;
 
-});
 
-let rata = 0;
+    // =====================================
+    // AMBIL DATA DARI URAIAN
+    // =====================================
 
-if(data.length > 0){
+    data.forEach(item => {
 
-rata =
-Math.round(
-totalRealisasi / data.length
-);
+        let daftarUraian =
+            item.uraian || [];
 
-}
 
-const ctx =
-document.getElementById(
-"grafikTriwulan"
-);
+        daftarUraian.forEach(uraian => {
 
-if(!ctx) return;
+            totalAngkasTW1 += Number(
+                uraian.tw1?.angkas || 0
+            );
 
-if(chartTriwulan){
+            totalRealisasiTW1 += Number(
+                uraian.tw1?.realisasi || 0
+            );
 
-chartTriwulan.destroy();
 
-}
+            totalAngkasTW2 += Number(
+                uraian.tw2?.angkas || 0
+            );
 
-chartTriwulan =
-new Chart(ctx,{
+            totalRealisasiTW2 += Number(
+                uraian.tw2?.realisasi || 0
+            );
 
-type:"line",
 
-data:{
+            totalAngkasTW3 += Number(
+                uraian.tw3?.angkas || 0
+            );
 
-labels:[
-"TW I",
-"TW II",
-"TW III",
-"TW IV"
-],
+            totalRealisasiTW3 += Number(
+                uraian.tw3?.realisasi || 0
+            );
 
-datasets:[{
 
-label:"Realisasi (%)",
+            totalAngkasTW4 += Number(
+                uraian.tw4?.angkas || 0
+            );
 
-data:[
-Math.round(rata*0.25),
-Math.round(rata*0.50),
-Math.round(rata*0.75),
-rata
-],
+            totalRealisasiTW4 += Number(
+                uraian.tw4?.realisasi || 0
+            );
 
-tension:0.4
+        });
 
-}]
+    });
 
-},
 
-options:{
-responsive:true
-}
+    // =====================================
+    // HITUNG PERSENTASE ASLI
+    // =====================================
 
-});
+    let persenTW1 =
+        totalAngkasTW1 > 0
+            ? Math.round(
+                (
+                    totalRealisasiTW1 /
+                    totalAngkasTW1
+                ) * 100
+            )
+            : 0;
+
+
+    let persenTW2 =
+        totalAngkasTW2 > 0
+            ? Math.round(
+                (
+                    totalRealisasiTW2 /
+                    totalAngkasTW2
+                ) * 100
+            )
+            : 0;
+
+
+    let persenTW3 =
+        totalAngkasTW3 > 0
+            ? Math.round(
+                (
+                    totalRealisasiTW3 /
+                    totalAngkasTW3
+                ) * 100
+            )
+            : 0;
+
+
+    let persenTW4 =
+        totalAngkasTW4 > 0
+            ? Math.round(
+                (
+                    totalRealisasiTW4 /
+                    totalAngkasTW4
+                ) * 100
+            )
+            : 0;
+
+
+    // =====================================
+    // AMBIL CANVAS
+    // =====================================
+
+    const ctx =
+        document.getElementById(
+            "grafikTriwulan"
+        );
+
+
+    if(!ctx) return;
+
+
+    if(chartTriwulan){
+
+        chartTriwulan.destroy();
+
+    }
+
+
+    // =====================================
+    // BUAT GRAFIK
+    // =====================================
+
+    chartTriwulan =
+        new Chart(ctx, {
+
+            type: "line",
+
+            data: {
+
+                labels: [
+                    "TW I",
+                    "TW II",
+                    "TW III",
+                    "TW IV"
+                ],
+
+                datasets: [{
+
+                    label:
+                        "Realisasi (%)",
+
+                    data: [
+                        persenTW1,
+                        persenTW2,
+                        persenTW3,
+                        persenTW4
+                    ],
+
+                    tension: 0.4
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100,
+
+                        ticks: {
+
+                            callback:
+                                function(value){
+
+                                    return value + "%";
+
+                                }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
 }
 let chartPenyerapan;
-
 function updateGrafikPenyerapan(){
 
-let data =
-JSON.parse(
-localStorage.getItem("data")
-) || [];
-let totalAngkas1 = 0;
-let totalRealisasi1 = 0;
-
-let totalAngkas2 = 0;
-let totalRealisasi2 = 0;
-
-let totalAngkas3 = 0;
-let totalRealisasi3 = 0;
-
-let totalAngkas4 = 0;
-let totalRealisasi4 = 0;
-
-data.forEach(item=>{
-
-    totalAngkas1 += Number(item.angkas1 || 0);
-    totalRealisasi1 += Number(item.realisasi1 || 0);
-
-    totalAngkas2 += Number(item.angkas2 || 0);
-    totalRealisasi2 += Number(item.realisasi2 || 0);
-
-    totalAngkas3 += Number(item.angkas3 || 0);
-    totalRealisasi3 += Number(item.realisasi3 || 0);
-
-    totalAngkas4 += Number(item.angkas4 || 0);
-    totalRealisasi4 += Number(item.realisasi4 || 0);
-
-});
-
-let rataTW1 = totalAngkas1 > 0
-? Math.round((totalRealisasi1 / totalAngkas1) * 100)
-: 0;
-
-let rataTW2 = totalAngkas2 > 0
-? Math.round((totalRealisasi2 / totalAngkas2) * 100)
-: 0;
-
-let rataTW3 = totalAngkas3 > 0
-? Math.round((totalRealisasi3 / totalAngkas3) * 100)
-: 0;
-
-let rataTW4 = totalAngkas4 > 0
-? Math.round((totalRealisasi4 / totalAngkas4) * 100)
-: 0;
-
-// Sinkronkan Card Dashboard
-if(document.getElementById("cardTW1")){
+    let data =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
 
 
-    document.getElementById("cardTW1").innerHTML = rataTW1 + "%";
-    document.getElementById("cardTW2").innerHTML = rataTW2 + "%";
-    document.getElementById("cardTW3").innerHTML = rataTW3 + "%";
-    document.getElementById("cardTW4").innerHTML = rataTW4 + "%";
+    // =====================================
+    // TOTAL ANGKAS DAN REALISASI
+    // =====================================
 
-}
+    let totalAngkas1 = 0;
+    let totalRealisasi1 = 0;
 
-// Sinkronkan Tabel Kinerja
-if(document.getElementById("tw1Persen")){
+    let totalAngkas2 = 0;
+    let totalRealisasi2 = 0;
 
-    document.getElementById("tw1Persen").innerHTML = rataTW1 + "%";
-    document.getElementById("tw2Persen").innerHTML = rataTW2 + "%";
-    document.getElementById("tw3Persen").innerHTML = rataTW3 + "%";
-    document.getElementById("tw4Persen").innerHTML = rataTW4 + "%";
-// Sinkronkan Tabel Penyerapan
-if(document.getElementById("serapanTW1")){
+    let totalAngkas3 = 0;
+    let totalRealisasi3 = 0;
 
-    document.getElementById("serapanTW1").innerHTML = rataTW1 + "%";
-    document.getElementById("serapanTW2").innerHTML = rataTW2 + "%";
-    document.getElementById("serapanTW3").innerHTML = rataTW3 + "%";
-    document.getElementById("serapanTW4").innerHTML = rataTW4 + "%";
+    let totalAngkas4 = 0;
+    let totalRealisasi4 = 0;
 
-}
-}updateGrafikKinerja(
-    rataTW1,
-    rataTW2,
-    rataTW3,
-    rataTW4
-);
-const ctx =
-document.getElementById(
-"grafikPenyerapan"
-);
 
-if(!ctx) return;
+    // =====================================
+    // AMBIL DATA DARI URAIAN
+    // =====================================
 
-if(chartPenyerapan){
+    data.forEach(item => {
 
-chartPenyerapan.destroy();
+        let daftarUraian =
+            item.uraian || [];
 
-}
 
-chartPenyerapan =
-new Chart(ctx,{
+        daftarUraian.forEach(uraian => {
 
-type:"bar",
+            // ==============================
+            // TW I
+            // ==============================
 
-data:{
+            totalAngkas1 += Number(
+                uraian.tw1?.angkas || 0
+            );
 
-labels:[
-"TW I",
-"TW II",
-"TW III",
-"TW IV"
-],
+            totalRealisasi1 += Number(
+                uraian.tw1?.realisasi || 0
+            );
 
-datasets:[{
 
-label:"Penyerapan (%)",
+            // ==============================
+            // TW II
+            // ==============================
 
-data:[
-rataTW1,
-rataTW2,
-rataTW3,
-rataTW4
-]
+            totalAngkas2 += Number(
+                uraian.tw2?.angkas || 0
+            );
 
-}]
+            totalRealisasi2 += Number(
+                uraian.tw2?.realisasi || 0
+            );
 
-},
 
-options:{
+            // ==============================
+            // TW III
+            // ==============================
 
-responsive:true,
+            totalAngkas3 += Number(
+                uraian.tw3?.angkas || 0
+            );
 
-scales:{
-y:{
-beginAtZero:true,
-max:100
-}
-}
+            totalRealisasi3 += Number(
+                uraian.tw3?.realisasi || 0
+            );
 
-}
 
-});
+            // ==============================
+            // TW IV
+            // ==============================
+
+            totalAngkas4 += Number(
+                uraian.tw4?.angkas || 0
+            );
+
+            totalRealisasi4 += Number(
+                uraian.tw4?.realisasi || 0
+            );
+
+        });
+
+    });
+
+
+    // =====================================
+    // HITUNG PERSENTASE PENYERAPAN
+    // =====================================
+
+    let rataTW1 =
+        totalAngkas1 > 0
+            ? Math.round(
+                (
+                    totalRealisasi1 /
+                    totalAngkas1
+                ) * 100
+            )
+            : 0;
+
+
+    let rataTW2 =
+        totalAngkas2 > 0
+            ? Math.round(
+                (
+                    totalRealisasi2 /
+                    totalAngkas2
+                ) * 100
+            )
+            : 0;
+
+
+    let rataTW3 =
+        totalAngkas3 > 0
+            ? Math.round(
+                (
+                    totalRealisasi3 /
+                    totalAngkas3
+                ) * 100
+            )
+            : 0;
+
+
+    let rataTW4 =
+        totalAngkas4 > 0
+            ? Math.round(
+                (
+                    totalRealisasi4 /
+                    totalAngkas4
+                ) * 100
+            )
+            : 0;
+
+
+    // =====================================
+    // SINKRONKAN CARD DASHBOARD
+    // =====================================
+
+    if(document.getElementById("cardTW1")){
+
+        document.getElementById("cardTW1").innerHTML =
+            rataTW1 + "%";
+
+        document.getElementById("cardTW2").innerHTML =
+            rataTW2 + "%";
+
+        document.getElementById("cardTW3").innerHTML =
+            rataTW3 + "%";
+
+        document.getElementById("cardTW4").innerHTML =
+            rataTW4 + "%";
+
+    }
+
+
+    // =====================================
+    // SINKRONKAN TABEL PENYERAPAN
+    // =====================================
+
+    if(document.getElementById("serapanTW1")){
+
+        document.getElementById("serapanTW1").innerHTML =
+            rataTW1 + "%";
+
+        document.getElementById("serapanTW2").innerHTML =
+            rataTW2 + "%";
+
+        document.getElementById("serapanTW3").innerHTML =
+            rataTW3 + "%";
+
+        document.getElementById("serapanTW4").innerHTML =
+            rataTW4 + "%";
+
+    }
+
+
+    // =====================================
+    // GRAFIK PENYERAPAN
+    // =====================================
+
+    const ctx =
+        document.getElementById(
+            "grafikPenyerapan"
+        );
+
+
+    if(!ctx) return;
+
+
+    if(chartPenyerapan){
+
+        chartPenyerapan.destroy();
+
+    }
+
+
+    chartPenyerapan =
+        new Chart(ctx, {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+                    "TW I",
+                    "TW II",
+                    "TW III",
+                    "TW IV"
+                ],
+
+                datasets: [{
+
+                    label:
+                        "Penyerapan (%)",
+
+                    data: [
+                        rataTW1,
+                        rataTW2,
+                        rataTW3,
+                        rataTW4
+                    ],
+
+                    borderWidth: 1
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100,
+
+                        ticks: {
+
+                            callback:
+                                function(value){
+
+                                    return value + "%";
+
+                                }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
 }
 
 function updateTanggalJam(){
@@ -1849,7 +2438,6 @@ setInterval(
 updateTanggalJam,
 1000
 );function updateDashboardNominal(){
- alert("UPDATE DASHBOARD TERPANGGIL");
     let data =
         JSON.parse(
             localStorage.getItem("data")
