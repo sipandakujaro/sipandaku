@@ -1,1461 +1,3778 @@
-body{
-margin:0;
-font-family:Arial;
-background:#f4f6f9;
-}
 
-.login-page{
-height:100vh;
-overflow-y:auto;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#0b2c5f;
-}
+function login(){
 
-.login-card{
-background:white;
-padding:30px;
-width:400px;
-border-radius:20px;
-text-align:center;
-}
+let user =
+document.getElementById("username").value;
 
-.logo{
-width:120px;
-}
+let pass =
+document.getElementById("password").value;
 
-.login-card input{
-width:100%;
-padding:12px;
-margin:10px 0;
-}
+if(user==="admin" && pass==="12345"){
+localStorage.setItem("login","true");
+localStorage.setItem(
+"role",
+"Admin"
+);
 
-.login-card button{
-width:100%;
-padding:12px;
-background:#0b2c5f;
-color:white;
-border:none;
-cursor:pointer;
-}
+masukDashboard();
 
-#dashboardPage{
-display:none;
-height:100vh;
-display:flex;
-}
+}else if(
+user==="kasubag" &&
+pass==="12345"
+){
 
-.sidebar{
-width:250px;
-background:#0b2c5f;
-color:white;
-padding:20px;
-}
+localStorage.setItem(
+"role",
+"Kasubag"
+);
 
-.sidebar ul{
-list-style:none;
-padding:0;
-}
+masukDashboard();
+
+}else if(
+user==="camat" &&
+pass==="12345"
+){
+
+localStorage.setItem(
+"role",
+"Camat"
+);
+
+masukDashboard();
 
-.sidebar li{
-padding:15px;
-cursor:pointer;
+}else{
+
+alert(
+"Username atau Password Salah"
+);
+
 }
 
-.sidebar li:hover{
-background:#17478f;
 }
+function masukDashboard(){
+
+let role =
+localStorage.getItem(
+"role"
+);
+
+document.getElementById(
+"userRole"
+).innerHTML =
+"Login sebagai : " + role;
 
-.main{
-flex:1;
-padding:30px;
-overflow:auto;
+let pesan = "";
+
+if(role === "Admin"){
+
+pesan =
+"🖥 Administrator SIPANDAKU";
+
+}else if(role === "Kasubag"){
+
+pesan =
+"📊 Kasubag Perencanaan & Keuangan";
+
+}else if(role === "Camat"){
+
+pesan =
+"🏛 Executive Dashboard Camat Jaro";
+
 }
-.cards{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
-margin:25px 0;
+
+document.getElementById(
+"welcomeRole"
+).innerHTML =
+pesan;
+
+document.getElementById(
+"loginPage"
+).style.display="none";
+
+document.getElementById(
+"dashboardPage"
+).style.display="flex";
+
+updateTanggalJam();
+let menu =
+document.querySelectorAll(
+".sidebar li"
+);
+
+if(role === "Camat"){
+
+menu[1].style.display = "none"; // Perencanaan
+menu[2].style.display = "none"; // Monitoring
+menu[3].style.display = "none"; // Dokumen
+
 }
-.card{
-background:white;
-padding:20px;
-border-radius:15px;
-width:250px;
 }
+function logout(){
+localStorage.removeItem("login");
+document.getElementById("dashboardPage")
+.style.display="none";
 
-#perencanaan input{
-display:block;
-width:400px;
-padding:10px;
-margin-bottom:10px;
-}
+document.getElementById("loginPage")
+.style.display="flex";
 
-#perencanaan button{
-padding:10px 20px;
 }
-table{
-    width:100%;
-    margin-top:20px;
-    border-collapse:collapse;
-    background:white;
-}#tabelData th:first-child,#tabelData td:first-child{
+function showPage(page){
 
-    vertical-align: middle;
-    text-align:center;
+    const pages = [
+        "dashboard",
+        "perencanaan",
+        "monitoring",
+        "dokumen",
+        "laporan"
+    ];
 
-}
+    pages.forEach(id => {
 
-th,
-td{
-    border:1px solid #ddd;
-    padding:10px;
-    vertical-align: middle;
-}
-th{
-background:#0b2c5f;
-color:white;
-}
+        document.getElementById(id).style.display = "none";
 
-.card{
+    });
 
-background:#fff;
 
-border-radius:15px;
+    document.getElementById(page).style.display = "block";
 
-padding:20px;
 
-box-shadow:0 5px 15px rgba(0,0,0,.08);
+    if(page == "dashboard"){
 
-transition:.3s;
+        tampilkanData();
 
-}
+    }
 
-.card:hover{
 
-transform:translateY(-5px);
+    if(page == "monitoring"){
 
-}
-.ringkasan{
+        tampilkanMonitoring();
+
+    }
+
+
+    if(page == "laporan"){
+
+        tampilkanLaporan();
 
-text-align:center;
+    }
 
 }
+function simpanData(){
+let subKegiatan =
+document.getElementById(
+"subKegiatan"
+).value;
 
-.ringkasan span{
+let indikator =
+document.getElementById(
+"indikator"
+).value;
 
-font-size:38px;
+let target =
+document.getElementById("target").value;
 
-display:block;
+let penanggungJawab =
+document.getElementById(
+"penanggungJawab"
+).value;
 
-margin-bottom:10px;
+let status =
+document.getElementById(
+"status"
+).value;
+let program =
+document.getElementById("program").value;
+let kegiatan =
+document.getElementById("kegiatan").value;
 
+let anggaran =
+document.getElementById("anggaran")
+.value
+.replace(/\./g,"")
+.trim();
+
+if(
+program==="" ||
+kegiatan==="" ||
+anggaran===""){
+alert("Lengkapi data terlebih dahulu");
+return;
 }
 
-.ringkasan h3{
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-margin:8px 0;
+if(editIndex >= 0){
+    const idEdit = data[editIndex].id;
+data[editIndex] = {
 
-font-size:17px;
+    id:data[editIndex].id,
 
-color:#666;
+    program,
+    kegiatan,
+    subKegiatan,
+    indikator,
+    target,
+    anggaran,
+    penanggungJawab,
+    status,
 
-}
+    realisasi:data[editIndex].realisasi,
 
-.ringkasan h2{
+    tw1:data[editIndex].tw1,
+    tw2:data[editIndex].tw2,
+    tw3:data[editIndex].tw3,
+    tw4:data[editIndex].tw4,
 
-font-size:34px;
+    angkas1:data[editIndex].angkas1 || 0,
+    realisasi1:data[editIndex].realisasi1 || 0,
+    persen1:data[editIndex].persen1 || 0,
 
-color:#0F4C81;
+    angkas2:data[editIndex].angkas2 || 0,
+realisasi2:data[editIndex].realisasi2 || 0,
+persen2:data[editIndex].persen2 || 0,
 
-margin-top:10px;
+angkas3:data[editIndex].angkas3 || 0,
+realisasi3:data[editIndex].realisasi3 || 0,
+persen3:data[editIndex].persen3 || 0,
 
-}
-.card h3{
-    color:#666;
-    margin-bottom:10px;
-}
+angkas4:data[editIndex].angkas4 || 0,
+realisasi4:data[editIndex].realisasi4 || 0,
+persen4:data[editIndex].persen4 || 0
 
-.card h1{
-    color:#0b2c5f;
-}
+    
+};
+simpanKeCloud({
 
-.chart-container{
-    margin-top:30px;
-    background:white;
-    padding:20px;
-    border-radius:15px;
-}#dokumen select,
-#dokumen input{
+    action:"edit",
 
-display:block;
-margin-bottom:10px;
-padding:10px;
-width:300px;
+    id:idEdit,
 
-}
+    program,
+    kegiatan,
+    subKegiatan,
+    indikator,
+    target,
+    anggaran,
+    penanggungJawab,
+    status
 
-#dokumen button{
+});
 
-padding:10px 20px;
-background:#0b2c5f;
-color:white;
-border:none;
-border-radius:8px;
-cursor:pointer;
+editIndex = -1;
+}else{
 
-}.welcome-box{
-    background:#fff;
-    border-radius:15px;
-    padding:20px 35px;
-    margin-bottom:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,.08);
-}.welcome-box h2{
-    font-size:32px;
-    margin-bottom:8px;
-}
+    data.push({
+
+id: Date.now(),
 
-.welcome-box p{
-    font-size:18px;
-    color:#666;
+program,
+kegiatan,
+subKegiatan,
+indikator,
+target,
+anggaran,
+penanggungJawab,
+status,
+
+realisasi:0,
+
+tw1:0,
+tw2:0,
+tw3:0,
+tw4:0,
+
+angkas1:0,
+realisasi1:0,
+persen1:0,
+
+angkas2:0,
+realisasi2:0,
+persen2:0,
+
+angkas3:0,
+realisasi3:0,
+persen3:0,
+
+angkas4:0,
+realisasi4:0,
+persen4:0
+});
+simpanKeCloud({
+
+    action:"simpan",
+
+    program,
+    kegiatan,
+    subKegiatan,
+    indikator,
+    target,
+    anggaran,
+    penanggungJawab,
+    status
+
+});
 }
-.progress-box{
+
+localStorage.setItem(
+"data",
+JSON.stringify(data)
+);
 
-background:white;
-padding:20px;
-margin-top:20px;
-border-radius:15px;
+document.getElementById("program").value="";
+document.getElementById("kegiatan").value="";
+document.getElementById("subKegiatan").value="";
+document.getElementById("indikator").value="";
+document.getElementById("target").value="";
+document.getElementById("anggaran").value="";
+document.getElementById("penanggungJawab").value="";
+document.getElementById("status").value="Belum";
 
+
+tampilkanData();
+tampilkanRealisasi();
+updateGrafik();
+tampilkanMonitoring();
+sukses(
+    "Berhasil",
+    "Data berhasil disimpan."
+);
 }
+
+function tampilkanData(){
 
-.progress{
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-width:100%;
-height:25px;
-background:#ddd;
-border-radius:20px;
-overflow:hidden;
+let tbody =
+document.querySelector(
+"#tabelData tbody"
+);
 
+if(tbody){
+    tbody.innerHTML="";
 }
+let totalAnggaran = 0;
+let totalRealisasi = 0;
 
-.progress-fill{
+data.forEach((item,index)=>{
 
-height:100%;
-width:0%;
-background:green;
-transition:0.5s;
+    totalAnggaran += Number(item.anggaran || 0);
 
-}#laporan{
+    totalRealisasi += Number(item.realisasi1 || 0);
+    totalRealisasi += Number(item.realisasi2 || 0);
+    totalRealisasi += Number(item.realisasi3 || 0);
+    totalRealisasi += Number(item.realisasi4 || 0);
 
-padding:20px;
+    if(tbody){
+tbody.innerHTML += `
+<td class="kolom-pilih">
+    <div class="checkbox-wrapper">
 
-}
+        <input
+            type="checkbox"
+            class="cekHapus"
+            value="${index}"
+            title="Pilih data ini"
+            onclick="pilihData(${index}); event.stopPropagation();">
 
-#laporan table{
+    </div>
+</td>
 
-margin-top:20px;
+<td>
+${index+1}
+</td>
 
-}.executive-box{
+<td>
+${item.program}
+</td>
 
-background:white;
-padding:20px;
-border-radius:15px;
-margin-bottom:20px;
+<td>${item.kegiatan}</td>
+<td>${item.subKegiatan}</td>
+<td>${item.indikator || "-"}</td>
+<td>${item.target || "-"}</td>
+<td>Rp ${Number(item.anggaran).toLocaleString("id-ID")}</td>
+<td>${item.penanggungJawab || ""}</td>
+<td>${item.status || ""}</td>
+</tr>
+`;
 
-}
+    }
 
-.status-grid{
+});
+let jumlahProgram =
+new Set(
+data.map(item=>item.program)
+).size;
 
-display:flex;
-gap:20px;
-flex-wrap:wrap;
+let jumlahKegiatan =
+new Set(
+data.map(item=>item.kegiatan)
+).size;
 
-}
+let jumlahSubKegiatan =
+new Set(
+data.map(item=>item.subKegiatan)
+).size;
+
 
-.status-card{
+document.getElementById("totalProgram").innerHTML =
+jumlahProgram;
 
-padding:25px;
+document.getElementById("totalKegiatan").innerHTML =
+jumlahKegiatan;
 
-border-radius:15px;
+document.getElementById("indProgram").innerHTML =
+jumlahProgram;
 
-min-height:140px;
+document.getElementById("indKegiatan").innerHTML =
+jumlahKegiatan;
 
-display:flex;
+document.getElementById("totalSubKegiatan").innerHTML =
+jumlahSubKegiatan;
 
-flex-direction:column;
+document.getElementById("indSubKegiatan").innerHTML =
+jumlahSubKegiatan;
 
-justify-content:center;
+console.log("Total Anggaran :", totalAnggaran);
+console.log("Total Realisasi :", totalRealisasi);
+let rata = 0;
 
-align-items:center;
+if(data.length > 0){
 
+rata = totalAnggaran > 0
+? Math.round((totalRealisasi / totalAnggaran) * 100)
+: 0;
 }
-.status-card h1{
+const rataEl =
+document.getElementById(
+"rataRealisasi"
+);
 
-font-size:48px;
+if(rataEl){
 
-margin-top:10px;
+rataEl.innerHTML =
+rata + "%";
 
 }
-.hijau{
-background:#28a745;
+
+let bar =
+document.getElementById(
+"progressKinerja"
+);
+
+let persen =
+document.getElementById(
+"persenKinerja"
+);
+
+if(bar){
+
+bar.style.width =
+rata + "%";
+
+if(rata >= 80){
+
+bar.style.background =
+"green";
+
+}else if(rata >= 50){
+
+bar.style.background =
+"orange";
+
+}else{
+
+bar.style.background =
+"red";
+
 }
 
-.kuning{
-background:#ffc107;
-color:black;
 }
+
+if(persen){
 
-.merah{
-background:#dc3545;
-}.role-box{
+persen.innerHTML =
+rata + "%";
 
-background:#e9f2ff;
-padding:10px;
-border-radius:10px;
-margin-bottom:20px;
-font-weight:bold;
+}
+let baik = 0;
+let berjalan = 0;
+let belum = 0;
 
-}.header-kecamatan{
+data.forEach(item=>{
 
-display:flex;
-align-items:center;
-gap:15px;
-background:white;
-padding:15px;
-border-radius:15px;
-margin-bottom:20px;
+    let progres = Math.max(
 
-}
+        Number(item.persen1 || 0),
+        Number(item.persen2 || 0),
+        Number(item.persen3 || 0),
+        Number(item.persen4 || 0)
 
-.logo-header{
+    );
 
-width:70px;
+    if(progres >= 100){
 
-}button{
+        baik++;
 
-padding:10px 20px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-margin:5px;
+    }else if(progres > 0){
 
-}
+        berjalan++;
+
+    }else{
 
-button:hover{
+        belum++;
 
-opacity:0.9;
+    }
 
-}.dashboard-row{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:20px;
-    margin-top:20px;
-}@media(max-width:1000px){
+});
+if(document.getElementById("statusBaik")){
 
-.dashboard-row{
+document.getElementById(
+"statusBaik"
+).innerHTML = baik;
 
-grid-template-columns:repeat(2,1fr);
+document.getElementById(
+"statusBerjalan"
+).innerHTML = berjalan;
 
+document.getElementById(
+"statusBelum"
+).innerHTML = belum;
+
 }
+if(document.getElementById("indSubKegiatan")){
+
+document.getElementById(
+"indPagu"
+).innerHTML =
+"Rp " +
+totalAnggaran.toLocaleString("id-ID");
 
+document.getElementById(
+"totalAnggaran"
+).innerHTML =
+"Rp " +
+totalAnggaran.toLocaleString("id-ID");
 }
+let totalTW1 = 0;
+let totalTW2 = 0;
+let totalTW3 = 0;
+let totalTW4 = 0;
 
-@media(max-width:700px){
+let totalNominalTW1 = 0;
+let totalNominalTW2 = 0;
+let totalNominalTW3 = 0;
+let totalNominalTW4 = 0;
 
-.dashboard-row{
+data.forEach(item=>{
 
-grid-template-columns:1fr;
+    totalTW1 += Number(item.tw1 || 0);
+    totalTW2 += Number(item.tw2 || 0);
+    totalTW3 += Number(item.tw3 || 0);
+    totalTW4 += Number(item.tw4 || 0);
 
-}
+    totalNominalTW1 += Number(item.realisasi1 || 0);
+    totalNominalTW2 += Number(item.realisasi2 || 0);
+    totalNominalTW3 += Number(item.realisasi3 || 0);
+    totalNominalTW4 += Number(item.realisasi4 || 0);
+});
+let rataTW1 =
+data.length ?
+Math.round(totalTW1/data.length)
+: 0;
 
-}
+let rataTW2 =
+data.length ?
+Math.round(totalTW2/data.length)
+: 0;
 
-.chart-box{
+let rataTW3 =
+data.length ?
+Math.round(totalTW3/data.length)
+: 0;
 
-flex:1;
-min-width:400px;
+let rataTW4 =
+data.length ?
+Math.round(totalTW4/data.length)
+: 0;updateGrafik();
 
-background:white;
+updateGrafikAnggaran();
 
-padding:20px;
+updateGrafikTriwulan();
 
-border-radius:15px;
+updateGrafikPenyerapan();
 
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+tampilkanMonitoring();
 
-}.indikator-panel{
+tampilkanLaporan();
+if(document.getElementById("tw1Persen")){
 
-display:flex;
-gap:20px;
-margin-top:25px;
-flex-wrap:wrap;
+    document.getElementById("tw1Persen").innerHTML = rataTW1 + "%";
+    document.getElementById("tw2Persen").innerHTML = rataTW2 + "%";
+    document.getElementById("tw3Persen").innerHTML = rataTW3 + "%";
+    document.getElementById("tw4Persen").innerHTML = rataTW4 + "%";
 
 }
 
-.indikator-box{
+if(document.getElementById("tw1Nominal")){
 
-flex:1;
-min-width:300px;
+document.getElementById("tw1Nominal").innerHTML =
+"Rp " + totalNominalTW1.toLocaleString("id-ID");
 
-background:white;
+document.getElementById("tw2Nominal").innerHTML =
+"Rp " + totalNominalTW2.toLocaleString("id-ID");
 
-padding:20px;
+document.getElementById("tw3Nominal").innerHTML =
+"Rp " + totalNominalTW3.toLocaleString("id-ID");
 
-border-radius:15px;
+document.getElementById("tw4Nominal").innerHTML =
+"Rp " + totalNominalTW4.toLocaleString("id-ID");
+}}
+function hapusData(){
 
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+if(confirm(
+"Yakin ingin menghapus semua data?"
+)){
 
-}
+localStorage.removeItem("data");
 
-.indikator-box h3{
+tampilkanData();
+tampilkanRealisasi();
 
-margin-bottom:15px;
+tampilkanMonitoring();
 
-color:#0b2c5f;
+tampilkanLaporan();
 
-}
+updateGrafik();
+console.log(
+JSON.parse(
+localStorage.getItem("data")
+)
+);
+}}
+let chartProgram;
 
-.indikator-table{
+function updateGrafik(){
 
-width:100%;
-border-collapse:collapse;
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
 
-}
+    let jumlahProgram =
+    new Set(data.map(item => item.program)).size;
 
-.indikator-table td{
+    const ctx =
+    document.getElementById("grafikProgram");
 
-padding:8px;
-border-bottom:1px solid #eee;
+    if(!ctx) return;
 
-}
+    if(chartProgram){
+        chartProgram.destroy();
+    }
 
-.indikator-table td:last-child{
+    chartProgram = new Chart(ctx,{
 
-text-align:right;
-font-weight:bold;
+        type:"bar",
 
-}.indikator-panel{
+        data:{
 
-display:flex;
-gap:20px;
-margin-top:20px;
-flex-wrap:wrap;
+            labels:["Program"],
 
-}
+            datasets:[{
 
-.indikator-box{
+                label:"Jumlah Program",
 
-flex:1;
-min-width:320px;
+                data:[jumlahProgram]
 
-background:#fff;
+            }]
 
-padding:20px;
+        },
 
-border-radius:15px;
+        options:{
+            responsive:true
+        }
 
-box-shadow:0 4px 10px rgba(0,0,0,.1);
+    });
 
-}
 
-.indikator-box h3{
+}function tampilkanMonitoring(){
 
-margin-bottom:15px;
-color:#0b2c5f;
+    let data =
+        JSON.parse(localStorage.getItem("data")) || [];
 
-}
+    let tbody =
+        document.querySelector(
+            "#tabelMonitoring tbody"
+        );
 
-.indikator-table{
+    if(!tbody) return;
 
-width:100%;
-border-collapse:collapse;
+    tbody.innerHTML = "";
 
-}
 
-.indikator-table td{
+    data.forEach((item, index) => {
 
-padding:10px;
-border-bottom:1px solid #eee;
+        // =====================================
+        // HITUNG DARI URAIAN
+        // =====================================
 
-}
+        let hasil =
+            hitungMonitoringUraian(item);
 
-.indikator-table td:last-child{
+        let persen1 =
+            Number(hasil.tw1.persen || 0);
 
-text-align:right;
-font-weight:bold;
-color:#0b2c5f;
+        let persen2 =
+            Number(hasil.tw2.persen || 0);
 
-}.btn-edit{
+        let persen3 =
+            Number(hasil.tw3.persen || 0);
 
-background:#f39c12;
-color:white;
-border:none;
-padding:6px 12px;
-border-radius:5px;
-cursor:pointer;
-margin-right:5px;
+        let persen4 =
+            Number(hasil.tw4.persen || 0);
 
-}
 
-.btn-hapus{
+        // =====================================
+        // TENTUKAN PROGRES
+        // =====================================
 
-background:#e74c3c;
-color:white;
-border:none;
-padding:6px 12px;
-border-radius:5px;
-cursor:pointer;
+        let progres =
+            Math.max(
+                persen1,
+                persen2,
+                persen3,
+                persen4
+            );
 
-}.info-box{
 
-background:white;
-padding:10px;
-border-radius:10px;
-margin-bottom:15px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
+        // =====================================
+        // STATUS
+        // =====================================
 
-}
+        let status = "";
 
-#tanggalJam{
+        if(progres == 0){
 
-font-weight:bold;
-color:#2c3e50;
+            status = "🔴 Belum";
 
-}.dashboard-header{
+        }else if(progres < 100){
 
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
+            status = "🟡 Berjalan";
 
-}
+        }else{
 
-.info-box{
+            status = "🟢 Selesai";
 
-background:#ffffff;
-padding:12px 18px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);
-min-width:320px;
-text-align:right;
+        }
 
-}
 
-.user-info{
+        // =====================================
+        // TAMPILKAN KE TABEL
+        // =====================================
+        tbody.innerHTML += `
 
-font-weight:bold;
-font-size:14px;
-color:#2c3e50;
-margin-bottom:5px;
+            <tr>
 
-}
+                <td>${index + 1}</td>
 
-.time-info{
+                <td>${item.program || "-"}</td>
 
-font-size:13px;
-color:#7f8c8d;
+                <td>${item.kegiatan || "-"}</td>
 
-}.dashboard-header{
+                <td>${item.subKegiatan || "-"}</td>
 
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
+                <td>
+                    Rp ${Number(
+                        item.anggaran || 0
+                    ).toLocaleString("id-ID")}
+                </td>
 
-}
+                <td>${persen1}%</td>
 
-.info-box{
+                <td>${persen2}%</td>
 
-background:#fff;
-padding:12px 20px;
-border-radius:12px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
-text-align:right;
+                <td>${persen3}%</td>
 
-}
+                <td>${persen4}%</td>
 
-.user-info{
+                <td>${status}</td>
 
-font-weight:bold;
-font-size:15px;
+                <td>
 
-}
+                    <button
+                        onclick="detailMonitoring(${index})">
 
-.time-info{
+                        👁
 
-font-size:13px;
-margin-top:5px;
-color:#555;
+                    </button>
 
-}
+                </td>
 
-.welcome-mini{
+            </tr>
 
-font-size:12px;
-margin-top:5px;
-color:#888;
+        `;
 
-}td:last-child{
+    });
 
-white-space:nowrap;
-text-align:center;
+}function detailMonitoring(index){
 
-}
+    let data =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
 
-.btn-edit,
-.btn-hapus{
+    let item =
+        data[index];
 
-padding:5px 10px;
-margin:2px;
 
-}.aksi-btn{
+    if(!item){
 
-display:flex;
-justify-content:center;
-gap:5px;
+        alert("Data tidak ditemukan.");
+        return;
 
-}
-.btn-edit{
-    background:#0d6efd;
-    color:white;
-    border:none;
-    padding:7px 15px;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:bold;
-    transition:0.3s;
-}
+    }
 
-.btn-edit:hover{
-    background:#0b5ed7;
-    transform:scale(1.05);
-}
-.master-card{
 
-background:#fff;
+    // =====================================
+    // BUKA MODAL
+    // =====================================
 
-padding:20px;
+    document
+        .getElementById("modalMonitoring")
+        .style.display = "flex";
 
-border-radius:10px;
 
-box-shadow:0 3px 10px rgba(0,0,0,.1);
+    // =====================================
+    // AMBIL URAIAN
+    // =====================================
 
-margin-top:20px;
+    let daftarUraian =
+        item.uraian || [];
 
-}
 
-.master-card input{
+    // =====================================
+    // BUAT TAMPILAN URAIAN
+    // =====================================
 
-width:60%;
+    let htmlUraian = "";
 
-padding:10px;
 
-margin-right:10px;
+    if(daftarUraian.length === 0){
 
-}
+        htmlUraian = `
+            <p style="
+                text-align:center;
+                color:#999;
+            ">
+                Belum ada uraian realisasi.
+            </p>
+        `;
 
-.master-card button{
+    }else{
 
-padding:10px 20px;
+        daftarUraian.forEach(
+            (uraian, indexUraian) => {
 
-background:#0d6efd;
+               htmlUraian += `
 
-color:white;
+    <div class="detail-uraian">
 
-border:none;
+        <h4>
+            Uraian ${indexUraian + 1}
+        </h4>
 
-border-radius:5px;
+        <p>
+            <b>Keterangan:</b>
+            ${uraian.keterangan || "-"}
+        </p>
 
-cursor:pointer;
+        <p>
+            <b>Target Kinerja:</b>
+            ${uraian.targetKinerja || "-"}
+        </p>
 
-}
+        <h4>💰 Realisasi Anggaran</h4>
 
-.master-card table{
+        <table class="detail-table">
 
-width:100%;
+            <thead>
 
-margin-top:20px;
+                <tr>
+                    <th>Triwulan</th>
+                    <th>Angkas</th>
+                    <th>Realisasi</th>
+                    <th>Persen</th>
+                </tr>
 
-border-collapse:collapse;
+            </thead>
 
-}
+            <tbody>
 
-.master-card th,
-.master-card td{
+                ${[1,2,3,4].map(tw => {
 
-border:1px solid #ddd;
+                    let dataTW =
+                        uraian["tw" + tw] || {};
 
-padding:10px;
+                    return `
 
-}
-.ringkasan{
+                        <tr>
 
-display:flex;
+                            <td>TW ${tw}</td>
 
-flex-direction:column;
+                            <td>
+                                Rp ${
+                                    Number(
+                                        dataTW.angkas || 0
+                                    ).toLocaleString("id-ID")
+                                }
+                            </td>
 
-align-items:center;
+                            <td>
+                                Rp ${
+                                    Number(
+                                        dataTW.realisasi || 0
+                                    ).toLocaleString("id-ID")
+                                }
+                            </td>
 
-justify-content:center;
+                            <td>
+                                ${
+                                    dataTW.persen || 0
+                                }%
+                            </td>
 
-padding:25px;
+                        </tr>
 
-border-radius:15px;
+                    `;
 
-background:white;
+                }).join("")}
 
-box-shadow:0 5px 15px rgba(0,0,0,.08);
+            </tbody>
 
-transition:.3s;
+        </table>
 
-}
 
-.ringkasan:hover{
+        <h4>📈 Realisasi Kinerja</h4>
 
-transform:translateY(-5px);
+        <table class="detail-table">
 
-}
+            <thead>
 
-.ringkasan span{
+                <tr>
+                    <th>Triwulan</th>
+                    <th>Realisasi</th>
+                    <th>Persen</th>
+                </tr>
 
-font-size:35px;
+            </thead>
 
-margin-bottom:10px;
+            <tbody>
 
-}
+                ${[1,2,3,4].map(tw => {
 
-.ringkasan h3{
+                    let dataTW =
+                        uraian["tw" + tw] || {};
 
-font-size:17px;
+                    return `
 
-color:#666;
+                        <tr>
 
-margin-bottom:8px;
+                            <td>TW ${tw}</td>
 
-}
+                            <td>
+                                ${
+                                    dataTW.realisasiKinerja ||
+                                    "-"
+                                }
+                            </td>
 
-.ringkasan h2{
+                            <td>
+                                ${
+                                    dataTW.persenKinerja || 0
+                                }%
+                            </td>
 
-font-size:32px;
+                        </tr>
 
-color:#0F4C81;
+                    `;
 
-}/* ===== Welcome Dashboard ===== */
+                }).join("")}
 
-.welcome-box{
-    background:#ffffff;
-    border-radius:15px;
-    padding:20px 30px;
-    margin:20px 0;
-    box-shadow:0 4px 10px rgba(0,0,0,.08);
-}
+            </tbody>
 
-.welcome-box h2{
-    font-size:28px;
-    margin:0;
-    color:#0F4C81;
-}
+        </table>
 
-.welcome-box p{
-    margin-top:8px;
-    color:#666;
-    font-size:16px;
-}
-/* ===== Dashboard Layout Baru ===== */
+    </div>
 
-.dashboard-content{
+`;
 
-display:grid;
+            }
+        );
 
-grid-template-columns:1fr 1fr;
+    }
 
-gap:25px;
 
-margin-top:25px;
+    // =====================================
+    // TAMPILKAN
+    // =====================================
 
-}
+    document
+        .getElementById("isiMonitoring")
+        .innerHTML = `
+
+        <h3>
+            ${item.program || "-"}
+        </h3>
 
-@media(max-width:1000px){
+        <p>
+            <b>Kegiatan :</b>
+            ${item.kegiatan || "-"}
+        </p>
 
-.dashboard-content{
+        <p>
+            <b>Sub Kegiatan :</b>
+            ${item.subKegiatan || "-"}
+        </p>
 
-grid-template-columns:1fr;
+        <p>
+            <b>Indikator :</b>
+            ${item.indikator || "-"}
+        </p>
 
+        <p>
+            <b>Target :</b>
+            ${item.target || "-"}
+        </p>
+
+        <hr>
+
+        <h3>
+            📋 Uraian Realisasi
+        </h3>
+
+        ${htmlUraian}
+
+    `;
+
 }
+function tutupMonitoring(){
+
+document.getElementById("modalMonitoring").style.display="none";
 
 }
-/* ===== CARD TRIWULAN ===== */
+function uploadDokumen(){
+
+let file =
+document.getElementById(
+"uploadDokumen"
+).files[0];
+
+if(!file){
 
-.tw-card{
+alert(
+"Pilih file terlebih dahulu"
+);
 
-background:white;
-padding:25px;
-border-radius:18px;
-box-shadow:0 5px 15px rgba(0,0,0,.08);
-text-align:center;
-transition:.3s;
+return;
 
 }
 
-.tw-card:hover{
+let jenis =
+document.getElementById(
+"jenisDokumen"
+).value;
 
-transform:translateY(-5px);
+let dokumen =
+JSON.parse(
+localStorage.getItem(
+"dokumen"
+)
+) || [];
 
-}
+dokumen.push({
 
-.tw-card:hover{
-    transform:translateY(-5px);
-}
+jenis,
+nama:file.name
 
-.tw-card h3{
-    margin:0;
-    color:#666;
-    font-size:20px;
-}
+});
 
-.tw-card h1{
-    margin-top:15px;
-    font-size:42px;
-    color:#0F4C81;
-}
-/* ===========================
-   MODAL DETAIL MONITORING
-=========================== */
-.modal{
+localStorage.setItem(
+"dokumen",
+JSON.stringify(dokumen)
+);
 
-display:none;
+tampilkanDokumen();
 
-position:fixed;
+alert(
+"Dokumen berhasil diupload"
+);
 
-top:0;
-left:0;
+}function tampilkanDokumen(){
 
-width:100%;
-height:100%;
+let data =
+JSON.parse(
+localStorage.getItem(
+"dokumen"
+)
+) || [];
 
-background:rgba(0,0,0,.45);
+let tbody =
+document.querySelector(
+"#tabelDokumen tbody"
+);
 
-z-index:9999;
+if(!tbody) return;
 
-overflow-y:auto;
+tbody.innerHTML="";
 
-}
+data.forEach((item,index)=>{
 
+tbody.innerHTML += `
 
-.close{
+<tr>
 
-float:right;
+<td>${index+1}</td>
 
-font-size:30px;
+<td>${item.jenis}</td>
 
-font-weight:bold;
+<td>${item.nama}</td>
 
-cursor:pointer;
+</tr>
 
-color:#888;
+`;
 
-}
+});
+
+document.getElementById(
+"totalDokumen"
+).innerHTML =
+data.length;
+
+}function exportExcel(){
 
-.close:hover{
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-color:red;
+if(data.length===0){
 
+alert("Belum ada data");
+
+return;
+
 }
 
-@keyframes muncul{
+let worksheet =
+XLSX.utils.json_to_sheet(data);
 
-from{
+let workbook =
+XLSX.utils.book_new();
 
-transform:translateY(-30px);
+XLSX.utils.book_append_sheet(
+workbook,
+worksheet,
+"Perencanaan"
+);
 
-opacity:0;
+XLSX.writeFile(
+workbook,
+"SIPANDAKU_Perencanaan.xlsx"
+);
 
-}
+}async function cetakPDF(){
 
-to{
+const { jsPDF } = window.jspdf;
 
-transform:translateY(0);
+const doc = new jsPDF();
 
-opacity:1;
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-}
+let totalAnggaran = 0;
+let totalRealisasi = 0;
 
-}
-/* ===========================
-   TABEL DETAIL MONITORING
-=========================== */
+data.forEach((item,index)=>{
+
+totalAnggaran +=
+Number(item.anggaran || 0);
+
+totalRealisasi +=
+Number(item.realisasi1 || 0);
+
+totalRealisasi +=
+Number(item.realisasi2 || 0);
 
-.detail-table{
+totalRealisasi +=
+Number(item.realisasi3 || 0);
 
-width:100%;
+totalRealisasi +=
+Number(item.realisasi4 || 0);
 
-border-collapse:collapse;
+});
 
-margin-top:15px;
+let rata = 0;
 
+if(data.length > 0){
+
+rata =
+Math.round(
+totalRealisasi / data.length
+);
+
 }
 
-.detail-table th{
+doc.setFontSize(16);
 
-background:#0d6efd;
+doc.text(
+"PEMERINTAH KABUPATEN TABALONG",
+105,
+15,
+{align:"center"}
+);
 
-color:white;
+doc.text(
+"KECAMATAN JARO",
+105,
+25,
+{align:"center"}
+);
 
-padding:10px;
+doc.setFontSize(11);
 
-text-align:center;
+doc.text(
+"LAPORAN TRIWULAN SIPANDAKU",
+105,
+35,
+{align:"center"}
+);
 
-}
+doc.line(
+20,
+40,
+190,
+40
+);
 
-.detail-table td{
+let y = 55;
 
-padding:10px;
+doc.text(
+"Ringkasan Kinerja",
+20,
+y
+);
 
-border:1px solid #ddd;
+y += 10;
 
-text-align:center;
+let jumlahProgram =
+new Set(
+data.map(item=>item.program)
+).size;
 
-}
+doc.text(
+"Total Program : " + jumlahProgram,
+20,
+y
+);
+y += 10;
 
-.detail-table tr:nth-child(even){
+doc.text(
+"Total Anggaran : Rp " +
+totalAnggaran.toLocaleString("id-ID"),
+20,
+y
+);
 
-background:#f8f9fa;
+y += 10;
 
-}
+doc.text(
+"Rata-rata Realisasi : " +
+rata + "%",
+20,
+y
+);
 
-.detail-table tr:hover{
+y += 20;
 
-background:#eef5ff;
+doc.text(
+"Daftar Program",
+20,
+y
+);
 
-}
-/* =========================
-   FORM PERENCANAAN
-========================= */
-#dataPerencanaan h2{
+y += 10;
 
-font-size:28px;
+data.forEach((item,index)=>{
 
-margin-bottom:20px;
+doc.text(
+(index+1)+". "+
+item.program+
+" - "+
+item.kegiatan,
+25,
+y
+);
 
-font-weight:700;
+y += 8;
 
-color:#1d3557;
+});
 
-}.form-perencanaan{
+y += 20;
 
-display:grid;
+doc.text(
+"Jaro, " +
+new Date().toLocaleDateString("id-ID"),
+130,
+y
+);
 
-grid-template-columns:1fr 1fr;
+y += 10;
 
-column-gap:30px;
+doc.text(
+"Camat Jaro",
+145,
+y
+);
 
-row-gap:20px;
+y += 30;
 
-max-width:1000px;
+doc.text(
+"(................................)",
+130,
+y
+);
+doc.addPage();
 
-margin:20px auto;
+doc.setFontSize(16);
 
-padding:30px;
+doc.text(
+"EXECUTIVE DASHBOARD",
+105,
+20,
+{align:"center"}
+);
 
-background:#fff;
+doc.setFontSize(12);
 
-border-radius:15px;
+doc.text(
+"Total Program : " + jumlahProgram,
+20,
+50
+);
 
-border:1px solid #e5e7eb;
+doc.text(
+"Total Anggaran : Rp " +
+totalAnggaran.toLocaleString("id-ID"),
+20,
+65
+);
 
-box-shadow:0 4px 12px rgba(0,0,0,.08);
+doc.text(
+"Rata-rata Realisasi : " +
+rata + "%",
+20,
+80
+);
+doc.save(
+"Laporan_Triwulan_SIPANDAKU.pdf"
+);
 
 }
+let chartAnggaran;
+
+function updateGrafikAnggaran(){
+
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-.form-group label{
+let total = 0;
 
-font-size:14px;
+data.forEach(item=>{
 
-font-weight:600;
+total +=
+Number(item.anggaran);
 
-margin-bottom:8px;
+});
 
-color:#2c3e50;
+const ctx =
+document.getElementById(
+"grafikAnggaran"
+);
 
+if(!ctx) return;
+
+if(chartAnggaran){
+
+chartAnggaran.destroy();
+
 }
-.aksi-perencanaan{
+
+chartAnggaran =
+new Chart(ctx,{
 
-display:flex;
+type:"doughnut",
 
-justify-content:center;
+data:{
 
-gap:12px;
+labels:["Anggaran"],
 
-margin-top:25px;
+datasets:[{
 
-flex-wrap:wrap;
+data:[total]
 
+}]
+
 }
-.form-group{
 
-display:flex;
+});
 
-flex-direction:column;
+}function tampilkanLaporan(){
 
-}.form-group input,
-.form-group select{
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-width:100%;
+let tbody =
+document.querySelector(
+"#tabelLaporan tbody"
+);
 
-height:48px;
+if(!tbody) return;
 
-padding:0 14px;
+tbody.innerHTML = "";
 
-font-size:15px;
+let totalAnggaran = 0;
+let totalRealisasi = 0;
 
-border:1px solid #d1d5db;
+data.forEach(item=>{
 
-border-radius:8px;
+totalAnggaran +=
+Number(item.anggaran || 0);
 
-box-sizing:border-box;
+totalRealisasi += Number(item.realisasi1 || 0);
+totalRealisasi += Number(item.realisasi2 || 0);
+totalRealisasi += Number(item.realisasi3 || 0);
+totalRealisasi += Number(item.realisasi4 || 0);
 
-background:#fff;
+tbody.innerHTML += `
 
-}
-.aksi-perencanaan button{
+<tr>
+
+<td>${item.program}</td>
+
+<td>${item.kegiatan}</td>
 
-padding:10px 20px;
+<td>
+Rp ${Number(item.anggaran)
+.toLocaleString("id-ID")}
+</td>
 
-border:none;
+<td>${item.realisasi}%</td>
 
-border-radius:8px;
+</tr>
 
-font-size:14px;
+`;
 
-font-weight:600;
+});
+let jumlahProgram =
+new Set(
+data.map(item=>item.program)
+).size;
 
-cursor:pointer;
+document.getElementById(
+"lapProgram"
+).innerHTML =
+jumlahProgram;
+document.getElementById(
+"lapAnggaran"
+).innerHTML =
+"Rp " +
+totalAnggaran.toLocaleString("id-ID");
 
-transition:.3s;
+let rata = 0;
 
-}/* Simpan */
-.aksi-perencanaan button:nth-child(1){
+if(data.length > 0){
 
-background:#0d6efd;
+rata =
+Math.round(
+totalRealisasi / data.length
+);
 
-color:white;
+}
+
+document.getElementById(
+"lapRealisasi"
+).innerHTML =
+rata + "%";
 
 }
+let chartKinerja;
+
+function updateGrafikKinerja(
+rataTW1,
+rataTW2,
+rataTW3,
+rataTW4
+){
+
+const ctx =
+document.getElementById(
+"grafikKinerja"
+);
 
-/* Edit */
-.aksi-perencanaan button:nth-child(2){
+if(!ctx) return;
 
-background:#198754;
+if(chartKinerja){
 
-color:white;
+chartKinerja.destroy();
 
 }
 
-/* Excel */
-.aksi-perencanaan button:nth-child(3){
+chartKinerja =
+new Chart(ctx,{
 
-background:#146c43;
+type:"line",
 
-color:white;
+data:{
 
-}
+labels:[
+"TW I",
+"TW II",
+"TW III",
+"TW IV"
+],
 
-/* PDF */
-.aksi-perencanaan button:nth-child(4){
+datasets:[{
 
-background:#dc3545;
+label:"Kinerja (%)",
 
-color:white;
+data:[
+rataTW1,
+rataTW2,
+rataTW3,
+rataTW4
+],
 
-}
+tension:0.4,
+fill:false
 
-/* Hapus */
-.aksi-perencanaan button:nth-child(5){
+}]
 
-background:#6c757d;
+},
 
-color:white;
+options:{
 
+responsive:true,
+
+scales:{
+y:{
+beginAtZero:true,
+max:100
+}
 }
 
-.aksi-perencanaan button:hover{
+}
 
-transform:translateY(-2px);
+});
 
-opacity:.9;
+}
+let chartTriwulan;
 
-}.aksi-perencanaan button{
+function updateGrafikTriwulan(){
 
-height:52px;
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-min-width:150px;
+let totalRealisasi = 0;
 
-font-size:18px;
+data.forEach(item=>{
 
-font-weight:600;
+totalRealisasi +=
+Number(item.realisasi || 0);
 
-}.form-group{
+});
 
-display:flex;
+let rata = 0;
 
-flex-direction:column;
+if(data.length > 0){
 
-width:100%;
+rata =
+Math.round(
+totalRealisasi / data.length
+);
 
-}.form-group label{
+}
 
-margin-bottom:8px;
+const ctx =
+document.getElementById(
+"grafikTriwulan"
+);
 
-font-size:15px;
+if(!ctx) return;
 
-font-weight:600;
+if(chartTriwulan){
 
-color:#334155;
+chartTriwulan.destroy();
 
 }
-.btn-kelola{
+
+chartTriwulan =
+new Chart(ctx,{
 
-background:#0d6efd;
+type:"line",
 
-color:white;
+data:{
 
-border:none;
+labels:[
+"TW I",
+"TW II",
+"TW III",
+"TW IV"
+],
 
-padding:8px 14px;
+datasets:[{
 
-border-radius:8px;
+label:"Realisasi (%)",
 
-cursor:pointer;
+data:[
+Math.round(rata*0.25),
+Math.round(rata*0.50),
+Math.round(rata*0.75),
+rata
+],
 
-font-size:13px;
+tension:0.4
 
-font-weight:600;
+}]
 
-transition:.3s;
+},
 
+options:{
+responsive:true
 }
+
+});
+}
+let chartPenyerapan;
+
+function updateGrafikPenyerapan(){
+
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
+let totalAngkas1 = 0;
+let totalRealisasi1 = 0;
 
-.btn-kelola:hover{
+let totalAngkas2 = 0;
+let totalRealisasi2 = 0;
 
-background:#0b5ed7;
+let totalAngkas3 = 0;
+let totalRealisasi3 = 0;
 
-transform:translateY(-2px);
+let totalAngkas4 = 0;
+let totalRealisasi4 = 0;
 
-}/* ================= MODAL ================= */
+data.forEach(item=>{
 
-.modal{
+    totalAngkas1 += Number(item.angkas1 || 0);
+    totalRealisasi1 += Number(item.realisasi1 || 0);
 
-display:none;
+    totalAngkas2 += Number(item.angkas2 || 0);
+    totalRealisasi2 += Number(item.realisasi2 || 0);
 
-position:fixed;
+    totalAngkas3 += Number(item.angkas3 || 0);
+    totalRealisasi3 += Number(item.realisasi3 || 0);
 
-top:0;
-left:0;
+    totalAngkas4 += Number(item.angkas4 || 0);
+    totalRealisasi4 += Number(item.realisasi4 || 0);
 
-width:100%;
-height:100%;
+});
 
-background:rgba(0,0,0,.45);
+let rataTW1 = totalAngkas1 > 0
+? Math.round((totalRealisasi1 / totalAngkas1) * 100)
+: 0;
 
-z-index:9999;
+let rataTW2 = totalAngkas2 > 0
+? Math.round((totalRealisasi2 / totalAngkas2) * 100)
+: 0;
 
-/* Tambahan */
+let rataTW3 = totalAngkas3 > 0
+? Math.round((totalRealisasi3 / totalAngkas3) * 100)
+: 0;
 
-overflow-y:auto;
+let rataTW4 = totalAngkas4 > 0
+? Math.round((totalRealisasi4 / totalAngkas4) * 100)
+: 0;
 
-}.modal-content{
+// Sinkronkan Card Dashboard
+if(document.getElementById("cardTW1")){
 
-background:#fff;
 
-width:90%;
+    document.getElementById("cardTW1").innerHTML = rataTW1 + "%";
+    document.getElementById("cardTW2").innerHTML = rataTW2 + "%";
+    document.getElementById("cardTW3").innerHTML = rataTW3 + "%";
+    document.getElementById("cardTW4").innerHTML = rataTW4 + "%";
 
-max-width:1100px;
+}
 
-max-height:90vh;
+// Sinkronkan Tabel Kinerja
+if(document.getElementById("tw1Persen")){
 
-overflow-y:auto;
+    document.getElementById("tw1Persen").innerHTML = rataTW1 + "%";
+    document.getElementById("tw2Persen").innerHTML = rataTW2 + "%";
+    document.getElementById("tw3Persen").innerHTML = rataTW3 + "%";
+    document.getElementById("tw4Persen").innerHTML = rataTW4 + "%";
+// Sinkronkan Tabel Penyerapan
+if(document.getElementById("serapanTW1")){
 
-overflow-x:hidden;
+    document.getElementById("serapanTW1").innerHTML = rataTW1 + "%";
+    document.getElementById("serapanTW2").innerHTML = rataTW2 + "%";
+    document.getElementById("serapanTW3").innerHTML = rataTW3 + "%";
+    document.getElementById("serapanTW4").innerHTML = rataTW4 + "%";
 
-border-radius:15px;
+}
+}updateGrafikKinerja(
+    rataTW1,
+    rataTW2,
+    rataTW3,
+    rataTW4
+);
+const ctx =
+document.getElementById(
+"grafikPenyerapan"
+);
 
-box-shadow:0 10px 30px rgba(0,0,0,.25);
+if(!ctx) return;
 
-padding:25px;
+if(chartPenyerapan){
 
-margin:auto;
+chartPenyerapan.destroy();
 
 }
-.modal-header{
 
-display:flex;
+chartPenyerapan =
+new Chart(ctx,{
 
-justify-content:space-between;
+type:"bar",
 
-align-items:center;
+data:{
 
-padding:18px 25px;
+labels:[
+"TW I",
+"TW II",
+"TW III",
+"TW IV"
+],
 
-background:#0d6efd;
+datasets:[{
 
-color:white;
+label:"Penyerapan (%)",
 
-}.modal-header h2{
+data:[
+rataTW1,
+rataTW2,
+rataTW3,
+rataTW4
+]
 
-margin:0;
+}]
 
-font-size:26px;
+},
 
-font-weight:700;
+options:{
 
-}.modal-body{
+responsive:true,
+
+scales:{
+y:{
+beginAtZero:true,
+max:100
+}
+}
 
-padding:20px 25px;
+}
 
-display:flex;
+});
+}
 
-flex-direction:column;
+function updateTanggalJam(){
 
-gap:12px;
+let sekarang =
+new Date();
 
+let tanggal =
+sekarang.toLocaleDateString(
+"id-ID",
+{
+weekday:'long',
+year:'numeric',
+month:'long',
+day:'numeric'
 }
+);
+
+let jam =
+sekarang.toLocaleTimeString(
+"id-ID"
+);
 
-.close{
+let el =
+document.getElementById(
+"tanggalJam"
+);
 
-font-size:28px;
+if(el){
 
-cursor:pointer;
+el.innerHTML =
+"📅 " +
+tanggal +
+" | 🕒 " +
+jam;
 
-font-weight:bold;
+}
 
 }
-.form-kelola{
 
-display:flex;
+setInterval(
+updateTanggalJam,
+1000
+);function updateDashboardNominal(){
+ alert("UPDATE DASHBOARD TERPANGGIL");
+    let data =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
 
-flex-direction:column;
 
-gap:15px;
+    let tw1 = 0;
+    let tw2 = 0;
+    let tw3 = 0;
+    let tw4 = 0;
 
-}#pilihTW{
 
-width:280px;
+    // =====================================
+    // HITUNG DARI URAIAN
+    // =====================================
 
-height:40px;
+    data.forEach(item => {
 
-font-size:15px;
+        let daftarUraian =
+            item.uraian || [];
 
-border-radius:8px;
 
-padding:0 10px;
+        daftarUraian.forEach(uraian => {
 
-}
-.persen-box{
+            tw1 += Number(
+                uraian.tw1?.realisasi || 0
+            );
 
-background:#f8f9fa;
+            tw2 += Number(
+                uraian.tw2?.realisasi || 0
+            );
 
-padding:15px;
+            tw3 += Number(
+                uraian.tw3?.realisasi || 0
+            );
 
-border-radius:10px;
+            tw4 += Number(
+                uraian.tw4?.realisasi || 0
+            );
 
-margin-top:15px;
+        });
 
-}
-#btnSimpanModal{
+    });
 
-width:100%;
 
-height:52px;
+    // =====================================
+    // TAMPILKAN KE DASHBOARD
+    // =====================================
 
-font-size:17px;
+    document.getElementById("tw1Nominal").innerHTML =
+        "Rp " +
+        tw1.toLocaleString("id-ID");
 
-font-weight:bold;
 
-border-radius:10px;
+    document.getElementById("tw2Nominal").innerHTML =
+        "Rp " +
+        tw2.toLocaleString("id-ID");
 
-}
 
-.persen-box{
+    document.getElementById("tw3Nominal").innerHTML =
+        "Rp " +
+        tw3.toLocaleString("id-ID");
+
+
+    document.getElementById("tw4Nominal").innerHTML =
+        "Rp " +
+        tw4.toLocaleString("id-ID");
+
+}
+function hapusBaris(index){
 
-background:#f5f7fa;
+let data =
+JSON.parse(
+localStorage.getItem("data")
+) || [];
 
-padding:15px;
+if(confirm(
+"Yakin ingin menghapus data ini?"
+)){
 
-border-radius:10px;
+data.splice(index,1);
 
-margin-top:10px;
+localStorage.setItem(
+"data",
+JSON.stringify(data)
+);
 
+tampilkanData();
+tampilkanRealisasi();
+tampilkanMonitoring();
+tampilkanLaporan();
+updateGrafik();
 }
 
-.modal-body h3{
+}let editIndex = -1;
+function editData(index){
 
-margin-top:15px;
+    showPage("perencanaan");   // PINDAHKAN KE ATAS
 
-color:#0d6efd;
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
 
-}#judulSubKegiatan{
+    let item = data[index];
 
-    background:#f8f9fa;
+    document.getElementById("program").value = item.program;
+    document.getElementById("kegiatan").value = item.kegiatan;
+    document.getElementById("subKegiatan").value = item.subKegiatan;
+    document.getElementById("indikator").value = item.indikator;
+    document.getElementById("target").value = item.target;
+    document.getElementById("anggaran").value = item.anggaran;
+    document.getElementById("penanggungJawab").value = item.penanggungJawab;
+    document.getElementById("status").value = item.status;
 
-    padding:15px;
+    editIndex = index;
 
-    border-left:5px solid #0d6efd;
+}
+document.addEventListener("DOMContentLoaded", function(){
+
+document.getElementById("username")
+.addEventListener("keydown", function(e){
 
-    border-radius:10px;
+if(e.key === "Enter"){
 
-    margin-bottom:15px;
+login();
 
 }
 
-#judulSubKegiatan b{
+});
 
-    color:#0d6efd;
+document.getElementById("password")
+.addEventListener("keydown", function(e){
 
-    font-size:16px;
+if(e.key === "Enter"){
 
+login();
+
 }
+
+});
 
-#judulSubKegiatan br{
+});
+function showPerencanaan(menu){
 
-    line-height:1.2;
+    document.getElementById("dataPerencanaan").style.display="none";
+    document.getElementById("realisasiTriwulan").style.display="none";
 
+    document.getElementById(menu).style.display="block";
+
+    if(menu==="realisasiTriwulan"){
+        tampilkanRealisasi();
+    }
+
 }
-.input-card{
+let dataTerpilih = -1;function pilihData(index){
+
+
+    dataTerpilih = index;
+
+    let semuaBaris =
+    document.querySelectorAll("#tabelData tbody tr");
+
+    semuaBaris.forEach(baris=>{
+
+        baris.style.background="";
+
+    });
+
+    semuaBaris[index].style.background="#d6eaff";
+
+
+}function editDataTerpilih(){
+
+    
 
-background:#f8f9fa;
+    if(dataTerpilih == -1){
 
-padding:20px;
 
-border-radius:12px;
+        return;
 
-margin-top:15px;
+    }
 
-border:1px solid #e5e7eb;
+    editData(dataTerpilih);
 
 }
-.input-card h3{
+function formatRupiah(input){
 
-font-size:22px;
+let angka = input.value.replace(/\D/g,'');
 
-margin-bottom:15px;
+input.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g,".");
 
-color:#0d6efd;
+}
+function tambahProgram(){
+
+let program =
+document.getElementById(
+"masterProgram"
+).value.trim();
+
+if(program==""){
+
+alert("Isi nama Program");
 
+return;
+
 }
-.input-card label{
 
-display:block;
+let data =
+JSON.parse(
+localStorage.getItem("masterProgram")
+) || [];
 
-margin-top:12px;
+if(data.includes(program)){
 
-margin-bottom:6px;
+alert("Program sudah ada");
 
-font-weight:600;
+return;
 
 }
-.input-card input{
+
+data.push(program);
 
-width:70%;
+localStorage.setItem(
 
-max-width:500px;
+"masterProgram",
 
-height:42px;
+JSON.stringify(data)
 
-padding:10px;
+);
 
-border-radius:8px;
+document.getElementById(
+"masterProgram"
+).value="";
 
-font-size:15px;
+tampilkanProgram();
 
 }
-.badge-status{
+function tampilkanProgram(){
 
-display:inline-block;
+let data =
+JSON.parse(
+localStorage.getItem(
+"masterProgram"
+)
+)||[];
 
-padding:6px 14px;
+let tbody =
+document.querySelector(
+"#tabelProgram tbody"
+);
 
-border-radius:20px;
+if(!tbody) return;
 
-color:white;
+tbody.innerHTML="";
 
-font-size:13px;
+data.forEach((item,index)=>{
 
-font-weight:bold;
+tbody.innerHTML +=`
 
-text-align:center;
+<tr>
 
-min-width:90px;
+<td>${index+1}</td>
 
-}.realisasi-container{
+<td>${item}</td>
 
-display:flex;
+<td>
 
-margin-top:20px;
+<button
+onclick="hapusProgram(${index})">
 
-}
+🗑 Hapus
 
-.realisasi-list{
+</button>
 
-width:100%;
+</td>
 
-}.realisasi-container{
+</tr>
 
-    display:flex;
+`;
 
-    gap:25px;
+});
 
-    align-items:flex-start;
+}function hapusProgram(index){
 
-}
+let data =
+JSON.parse(
+localStorage.getItem(
+"masterProgram"
+)
+)||[];
 
-.realisasi-list{
+data.splice(index,1);
 
-    flex:2;
+localStorage.setItem(
 
+"masterProgram",
+
+JSON.stringify(data)
+
+);
+
+tampilkanProgram();
+
 }
-.realisasi-form{
+function tampilkanRealisasi(){
 
-    position:sticky;
+let data =
+JSON.parse(localStorage.getItem("data")) || [];
 
-    top:20px;
+let tbody =
+document.querySelector("#tabelRealisasi tbody");
 
-}.cekHapus{
+if(!tbody) return;
 
-    transform:scale(.7);
+tbody.innerHTML="";
 
-    margin:0;
+data.forEach((item,index)=>{
 
-}.kolom-pilih{
+// Ambil progres triwulan terakhir
 
-    width:35px !important;
-    min-width:35px;
-    max-width:35px;
+let progres = 0;
 
-    padding:0 !important;
+if(Number(item.persen4) > 0){
 
-    text-align:center;
+    progres = Number(item.persen4);
 
-}.checkbox-wrapper{
+}else if(Number(item.persen3) > 0){
 
-display:flex;
+    progres = Number(item.persen3);
 
-justify-content:center;
+}else if(Number(item.persen2) > 0){
 
-align-items:center;
+    progres = Number(item.persen2);
 
+}else{
+
+    progres = Number(item.persen1 || 0);
+
 }
-.tengah-checkbox{
+
+// Tentukan status
+
+let status = "";
+let warna = "";
 
-    display:flex;
+if(progres == 0){
 
-    justify-content:center;
+    status = "Belum";
+    warna = "#dc3545";
 
-    align-items:center;
+}else if(progres < 100){
 
-    height:100%;
+    status = "Berjalan";
+    warna = "#ffc107";
 
+}else{
+
+    status = "Selesai";
+    warna = "#198754";
+
+}tbody.innerHTML += `
+
+<tr>
+
+<td>${index+1}</td>
+
+<td>${item.program}</td>
+
+<td>${item.subKegiatan}</td>
+
+<td>${item.indikator}</td>
+
+<td>${item.target}</td>
+
+<td>
+Rp ${Number(item.anggaran || 0).toLocaleString("id-ID")}
+</td>
+
+<!-- STATUS -->
+
+<td>
+
+<span
+class="badge-status"
+style="background:${warna};">
+
+${status}
+
+</span>
+
+</td>
+
+<!-- KELOLA -->
+
+<td>
+
+<button
+class="btn-kelola"
+onclick="bukaKelola(${index})">
+
+✏ Kelola
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
 }
+function simpanTW1(index){
+
+    let data = JSON.parse(localStorage.getItem("data")) || [];
+
+    let angkas = Number(
+        (document.getElementById("angkas1_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let realisasi = Number(
+        (document.getElementById("realisasi1_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let persen = 0;
+
+    if(angkas > 0){
+        persen = Math.round((realisasi / angkas) * 100);
+    }
+
+    data[index].angkas1 = angkas;
+    data[index].realisasi1 = realisasi;
+    data[index].persen1 = persen;
+
+    // dipakai dashboard lama
+    data[index].tw1 = persen;
+
+    localStorage.setItem("data", JSON.stringify(data));
+    simpanKeCloud({
+
+    action:"simpanTW1",
+
+    id:data[index].id,
+
+    angkas1:angkas,
+
+    realisasi1:realisasi,
+
+    persen1:persen
+
+});
+
+    simpanKeCloud({
+
+    action:"simpanTW1",
+
+    id:data[index].id,
+
+    angkas1:angkas,
+
+    realisasi1:realisasi,
+
+    persen1:persen
+
+});
+
+    document.getElementById("persen1_"+index).innerHTML = persen + "%";
+
+   tampilkanData();
+tampilkanRealisasi();
+tampilkanMonitoring();
+tampilkanLaporan();
+updateGrafik();
+updateGrafikPenyerapan();
+    alert("Realisasi TW I berhasil disimpan");
+
+}function simpanTW2(index){
+
+    let data = JSON.parse(localStorage.getItem("data")) || [];
+
+    let angkas = Number(
+        (document.getElementById("angkas2_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let realisasi = Number(
+        (document.getElementById("realisasi2_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let persen = 0;
+
+    if(angkas > 0){
+        persen = Math.round((realisasi / angkas) * 100);
+    }
+
+    data[index].angkas2 = angkas;
+    data[index].realisasi2 = realisasi;
+    data[index].persen2 = persen;
+
+    data[index].tw2 = persen;
+
+    localStorage.setItem("data", JSON.stringify(data));
+
+    document.getElementById("persen2_"+index).innerHTML = persen + "%";
+
+    tampilkanData();
+tampilkanRealisasi();
+tampilkanMonitoring();
+tampilkanLaporan();
+updateGrafik();
+updateGrafikPenyerapan();
+    alert("Realisasi TW II berhasil disimpan");
+
+}
+function simpanTW3(index){
+
+    let data = JSON.parse(localStorage.getItem("data")) || [];
+
+    let angkas = Number(
+        (document.getElementById("angkas3_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let realisasi = Number(
+        (document.getElementById("realisasi3_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let persen = 0;
+
+    if(angkas > 0){
+        persen = Math.round((realisasi / angkas) * 100);
+    }
+
+    data[index].angkas3 = angkas;
+    data[index].realisasi3 = realisasi;
+    data[index].persen3 = persen;
+
+    data[index].tw3 = persen;
+
+    localStorage.setItem("data", JSON.stringify(data));
+
+    document.getElementById("persen3_"+index).innerHTML = persen + "%";
+
+  tampilkanData();
+tampilkanRealisasi();
+tampilkanMonitoring();
+tampilkanLaporan();
+updateGrafik();
+
+    alert("Realisasi TW III berhasil disimpan");
+
+}function simpanTW4(index){
+
+    let data = JSON.parse(localStorage.getItem("data")) || [];
+
+    let angkas = Number(
+        (document.getElementById("angkas4_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let realisasi = Number(
+        (document.getElementById("realisasi4_"+index).value || "0")
+        .replace(/\./g,"")
+    );
+
+    let persen = 0;
+
+    if(angkas > 0){
+        persen = Math.round((realisasi / angkas) * 100);
+    }
+
+    data[index].angkas4 = angkas;
+    data[index].realisasi4 = realisasi;
+    data[index].persen4 = persen;
+
+    data[index].tw4 = persen;
+
+    localStorage.setItem("data", JSON.stringify(data));
+
+    document.getElementById("persen4_"+index).innerHTML = persen + "%";
+
+   tampilkanData();
+tampilkanRealisasi();
+tampilkanMonitoring();
+tampilkanLaporan();
+updateGrafik();
+
+    alert("Realisasi TW IV berhasil disimpan");
+
+}let indexKelola = -1;function bukaKelola(index){
+
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
+
+    let item = data[index];
+
+   indexKelola = index;
+
+// TAMPILKAN FORM SAAT KELola DIKLIK
+document.getElementById("panelInput").style.display = "block";
+
+// BERSIHKAN URAIAN LAMA
+document.getElementById("daftarUraian").innerHTML = "";
+
+    // Isi informasi data master
+    document.getElementById("formProgram").value =
+    item.program || "";
+
+    document.getElementById("formSubKegiatan").value =
+    item.subKegiatan || "";
+
+    document.getElementById("formIndikator").value =
+    item.indikator || "";
+
+    document.getElementById("formTarget").value =
+    item.target || "";
+
+    // Ambil data sesuai Triwulan yang dipilih
+    loadPanelTW();
+
+}
+function loadPanelTW(){
+
+    if(indexKelola == -1) return;
+
+
+    // =====================================
+    // AMBIL DATA
+    // =====================================
+
+    let data =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
+
+
+    let item =
+        data[indexKelola];
+
+
+    if(!item) return;
+
+
+    // =====================================
+    // CONTAINER URAIAN
+    // =====================================
+
+    let container =
+        document.getElementById(
+            "daftarUraian"
+        );
+
+
+    if(!container) return;
+
+
+    // Bersihkan tampilan lama
+    container.innerHTML = "";
+
+
+    // =====================================
+    // AMBIL URAIAN
+    // =====================================
+
+    let daftarUraian =
+        item.uraian || [];
+
+
+    // =====================================
+    // BELUM ADA URAIAN
+    // =====================================
+
+    if(daftarUraian.length === 0){
+
+        hitungTotalUraian();
+
+        return;
+
+    }
+
+
+    // =====================================
+    // TAMPILKAN SETIAP URAIAN
+    // =====================================
+
+    daftarUraian.forEach(
+        (uraian, index) => {
+
+
+        // Buat kotak uraian
+        tambahUraian();
+
+
+        let boxes =
+            container.querySelectorAll(
+                ".boxUraian"
+            );
+
+
+        let box =
+            boxes[boxes.length - 1];
+
+
+        if(!box) return;
+
+
+        // =================================
+        // KETERANGAN URAIAN
+        // =================================
+
+        let inputKeterangan =
+            box.querySelector(
+                ".inputUraian"
+            );
+
+
+        if(inputKeterangan){
+
+            inputKeterangan.value =
+                uraian.keterangan || "";
+
+        }
+
+
+        // =================================
+        // TARGET KINERJA
+        // =================================
+
+        let inputTargetKinerja =
+            box.querySelector(
+                ".inputTargetKinerjaUraian"
+            );
+
+
+        if(inputTargetKinerja){
+
+            inputTargetKinerja.value =
+                uraian.targetKinerja || "";
+
+        }
+
+
+        // =================================
+        // TRIWULAN I - IV
+        // =================================
+
+        for(
+            let nomorTW = 1;
+            nomorTW <= 4;
+            nomorTW++
+        ){
+
+            let dataTW =
+                uraian[
+                    "tw" + nomorTW
+                ] || {};
+
+
+            // -----------------------------
+            // ANGKAS
+            // -----------------------------
+
+            let angkasInput =
+                box.querySelector(
+                    ".inputAngkasUraian.tw" +
+                    nomorTW
+                );
+
+
+            if(angkasInput){
+
+                angkasInput.value =
+                    dataTW.angkas
+                    ? Number(
+                        dataTW.angkas
+                    ).toLocaleString(
+                        "id-ID"
+                    )
+                    : "";
+
+            }
+
+
+            // -----------------------------
+            // REALISASI ANGGARAN
+            // -----------------------------
+
+            let realisasiInput =
+                box.querySelector(
+                    ".inputRealisasiUraian.tw" +
+                    nomorTW
+                );
+
+
+            if(realisasiInput){
+
+                realisasiInput.value =
+                    dataTW.realisasi
+                    ? Number(
+                        dataTW.realisasi
+                    ).toLocaleString(
+                        "id-ID"
+                    )
+                    : "";
+
+            }
+
+
+            // -----------------------------
+            // PERSENTASE ANGGARAN
+            // -----------------------------
+
+            let persenInput =
+                box.querySelector(
+                    ".inputPersenUraian.tw" +
+                    nomorTW
+                );
+
+
+            if(persenInput){
+
+                persenInput.value =
+                    (dataTW.persen || 0) +
+                    "%";
+
+            }
+
+
+            // -----------------------------
+            // REALISASI KINERJA
+            // -----------------------------
+
+            let realisasiKinerjaInput =
+                box.querySelector(
+                    ".inputRealisasiKinerjaUraian.tw" +
+                    nomorTW
+                );
+
+
+            if(realisasiKinerjaInput){
+
+                realisasiKinerjaInput.value =
+                    dataTW.realisasiKinerja || "";
+
+            }
+
+
+            // -----------------------------
+            // PERSENTASE KINERJA
+            // -----------------------------
+
+            let persenKinerjaInput =
+                box.querySelector(
+                    ".inputPersenKinerjaUraian.tw" +
+                    nomorTW
+                );
+
+
+            if(persenKinerjaInput){
+
+                persenKinerjaInput.value =
+                    (dataTW.persenKinerja || 0) +
+                    "%";
+
+            }
+
+        }
+
+    });
+
+
+    // =====================================
+    // HITUNG TOTAL URAIAN
+    // =====================================
+
+    hitungTotalUraian();
+
+}function hitungPersentasePanel(){
+
+    // ==========================
+    // Persentase Anggaran
+    // ==========================
+
+    let persenAnggaran = 0;
+
+    if(angkas > 0){
+
+        persenAnggaran = Math.round((realisasi / angkas) * 100);
+
+    }
+
+    // Simpan sementara ke LocalStorage
+
+    let tw = document.getElementById("formTW").value;
+
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
+
+    if(indexKelola != -1){
+
+        data[indexKelola]["persen"+tw] = persenAnggaran;
+
+        localStorage.setItem(
+            "data",
+            JSON.stringify(data)
+        );
+
+    }
+
+    // ==========================
+    // Persentase Kinerja
+    // ==========================
+
+    let target =
+    document.getElementById("formTarget").value;
+
+    let realisasiKinerja =
+    document.getElementById("formRealisasiKinerja").value;
+
+    let angkaTarget =
+    parseFloat(target.replace(/[^0-9]/g,"")) || 0;
+
+    let angkaRealisasi =
+    parseFloat(realisasiKinerja.replace(/[^0-9]/g,"")) || 0;
+
+    let persenKinerja = 0;
+
+    if(angkaTarget > 0){
+
+        persenKinerja =
+        Math.round((angkaRealisasi / angkaTarget) * 100);
+
+    }
+
+    document.getElementById("persenKinerjaForm").innerHTML =
+    persenKinerja + "%";
+
+}
+function tutupKelola(){
+
+    document.getElementById("modalKelola").style.display="none";
+
+}
+function loadDataTriwulan(){
+
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
+
+    if(indexKelola==-1) return;
+
+    let item=data[indexKelola];
+
+    let tw=
+    document.getElementById("pilihTW").value;
+
+    // =====================
+    // ANGGARAN
+    // =====================
+
+    document.getElementById("modalAngkas").value=
+    item["angkas"+tw]
+    ? Number(item["angkas"+tw]).toLocaleString("id-ID")
+    : "";
+
+    document.getElementById("modalRealisasi").value=
+    item["realisasi"+tw]
+    ? Number(item["realisasi"+tw]).toLocaleString("id-ID")
+    : "";
+
+    // =====================
+    // KINERJA
+    // =====================
+
+    document.getElementById("modalTarget").value=
+    item["targetKinerja"+tw] || "";
+
+    document.getElementById("modalKinerja").value=
+    item["realisasiKinerja"+tw] || "";
+
+    // =====================
+    // PERSENTASE
+    // =====================
+
+    document.getElementById("persenAnggaranModal").innerHTML=
+    (item["persen"+tw] || 0)+"%";
+
+}function simpanKelola(){
+ return;
+ /*
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
+
+    let item = data[indexKelola];
+
+    let tw =
+    document.getElementById("pilihTW").value;
+
+    // =====================
+     // Kode lama dinonaktifkan sementara
+    
+    // =====================
+
+    let angkas =
+    Number(
+    document.getElementById("modalAngkas")
+    .value.replace(/\./g,"")
+    ||0);
+
+    let realisasi =
+    Number(
+    document.getElementById("modalRealisasi")
+    .value.replace(/\./g,"")
+    ||0);
+
+    let target =
+    document.getElementById("modalTarget").value;
+
+    let realisasiKinerja =
+    document.getElementById("modalKinerja").value;
+
+    // =====================
+    // SIMPAN
+    // =====================
+
+    item["angkas"+tw]=angkas;
+
+    item["realisasi"+tw]=realisasi;
+
+    item["targetKinerja"+tw]=target;
+
+    item["realisasiKinerja"+tw]=realisasiKinerja;
+
+    // =====================
+    // HITUNG %
+    // =====================
+
+    let persenAnggaran = 0;
+
+    if(angkas>0){
+
+        persenAnggaran =
+        Math.round(
+        realisasi/angkas*100
+        );
+
+    }
+
+    item["persen"+tw]=persenAnggaran;
+
+    // =====================
+    // SIMPAN LOCAL STORAGE
+    // =====================
+
+    data[indexKelola]=item;
+
+    localStorage.setItem(
+        "data",
+        JSON.stringify(data)
+    );
+
+    // =====================
+    // UPDATE MODAL
+    // =====================
+
+    document.getElementById(
+        "persenAnggaranModal"
+    ).innerHTML=
+    persenAnggaran+"%";
+
+    // =====================
+    // REFRESH SEMUA
+    // =====================
+
+    tampilkanMonitoring();
+
+    tampilkanDashboard();
+
+    tampilkanRealisasi();
+
+    updateGrafikPenyerapan();
+
+    tutupKelola();
+       */
+}
+function simpanPanel(){
+
+    if(indexKelola == -1){
+
+        alert("Silakan pilih data terlebih dahulu.");
+        return;
+
+    }
+
+
+    // =====================================
+    // AMBIL DATA LOCAL STORAGE
+    // =====================================
+
+    let data =
+        JSON.parse(localStorage.getItem("data")) || [];
+
+    let item =
+        data[indexKelola];
+
+    if(!item){
+
+        alert("Data tidak ditemukan.");
+        return;
+
+    }
+
+
+    // =====================================
+    // SIMPAN SEMUA URAIAN
+    // =====================================
+
+    let daftarUraian = [];
+
+
+    document
+        .querySelectorAll(".boxUraian")
+        .forEach(box => {
+
+
+            // ==============================
+            // KETERANGAN URAIAN
+            // ==============================
+
+            let keterangan =
+                box.querySelector(
+                    ".inputUraian"
+                )?.value.trim() || "";
+
+
+            // ==============================
+            // TARGET KINERJA
+            // ==============================
+
+            let targetKinerja =
+                box.querySelector(
+                    ".inputTargetKinerjaUraian"
+                )?.value.trim() || "";
+
+
+            let uraianData = {
+
+                keterangan:
+                    keterangan,
+
+                targetKinerja:
+                    targetKinerja
+
+            };
+
+
+            // ==============================
+            // TW I - IV
+            // ==============================
+
+            for(
+                let nomorTW = 1;
+                nomorTW <= 4;
+                nomorTW++
+            ){
+
+                let angkasInput =
+                    box.querySelector(
+                        ".inputAngkasUraian.tw" +
+                        nomorTW
+                    );
+
+
+                let realisasiInput =
+                    box.querySelector(
+                        ".inputRealisasiUraian.tw" +
+                        nomorTW
+                    );
+
+
+                let persenInput =
+                    box.querySelector(
+                        ".inputPersenUraian.tw" +
+                        nomorTW
+                    );
+
+
+                let realisasiKinerjaInput =
+                    box.querySelector(
+                        ".inputRealisasiKinerjaUraian.tw" +
+                        nomorTW
+                    );
+
+
+                let persenKinerjaInput =
+                    box.querySelector(
+                        ".inputPersenKinerjaUraian.tw" +
+                        nomorTW
+                    );
+
+
+                // ==========================
+                // ANGKAS
+                // ==========================
+
+                let angkas =
+                    Number(
+                        (
+                            angkasInput?.value ||
+                            ""
+                        ).replace(
+                            /[^0-9]/g,
+                            ""
+                        )
+                    ) || 0;
+
+
+                // ==========================
+                // REALISASI ANGGARAN
+                // ==========================
+
+                let realisasi =
+                    Number(
+                        (
+                            realisasiInput?.value ||
+                            ""
+                        ).replace(
+                            /[^0-9]/g,
+                            ""
+                        )
+                    ) || 0;
+
+
+                // ==========================
+                // PERSENTASE ANGGARAN
+                // ==========================
+
+                let persen = 0;
+
+
+                if(angkas > 0){
+
+                    persen =
+                        Math.round(
+                            (
+                                realisasi /
+                                angkas
+                            ) * 100
+                        );
+
+                }
+
+
+                // ==========================
+                // REALISASI KINERJA
+                // ==========================
+
+                let realisasiKinerja =
+                    realisasiKinerjaInput
+                    ? realisasiKinerjaInput.value.trim()
+                    : "";
+
+
+                // ==========================
+                // PERSENTASE KINERJA
+                // ==========================
+
+                let angkaTarget =
+                    parseFloat(
+                        targetKinerja.replace(
+                            /[^0-9]/g,
+                            ""
+                        )
+                    ) || 0;
+
+
+                let angkaRealisasiKinerja =
+                    parseFloat(
+                        realisasiKinerja.replace(
+                            /[^0-9]/g,
+                            ""
+                        )
+                    ) || 0;
+
+
+                let persenKinerja = 0;
+
+
+                if(angkaTarget > 0){
+
+                    persenKinerja =
+                        Math.round(
+                            (
+                                angkaRealisasiKinerja /
+                                angkaTarget
+                            ) * 100
+                        );
+
+                }
+
+
+                // ==========================
+                // SIMPAN DATA TRIWULAN
+                // ==========================
+
+                uraianData[
+                    "tw" + nomorTW
+                ] = {
+
+                    angkas:
+                        angkas,
+
+                    realisasi:
+                        realisasi,
+
+                    persen:
+                        persen,
+
+                    realisasiKinerja:
+                        realisasiKinerja,
+
+                    persenKinerja:
+                        persenKinerja
+
+                };
+
+
+                // ==========================
+                // UPDATE TAMPILAN
+                // ==========================
+
+                if(persenInput){
+
+                    persenInput.value =
+                        persen + "%";
+
+                }
+
+
+                if(persenKinerjaInput){
+
+                    persenKinerjaInput.value =
+                        persenKinerja + "%";
+
+                }
+
+            }
+
+
+            daftarUraian.push(
+                uraianData
+            );
+
+        });
+
+
+    // =====================================
+    // SIMPAN KE ITEM
+    // =====================================
+
+    item.uraian =
+        daftarUraian;
+
+
+    data[indexKelola] =
+        item;
+
+
+    // =====================================
+    // SIMPAN LOCAL STORAGE
+    // =====================================
+
+    localStorage.setItem(
+        "data",
+        JSON.stringify(data)
+    );
+
+
+    // =====================================
+    // SIMPAN KE CLOUD
+    // =====================================
+
+    simpanKeCloud({
+
+        action: "simpanPanel",
+
+        id: item.id,
+
+        uraian: item.uraian
+
+    });
+
+
+    // =====================================
+    // REFRESH TAMPILAN
+    // =====================================
+
+    tampilkanData();
+
+    tampilkanRealisasi();
+
+    tampilkanMonitoring();
+
+
+    if(
+        typeof tampilkanLaporan ===
+        "function"
+    ){
+
+        tampilkanLaporan();
+
+    }
+
+
+    if(
+        typeof updateGrafik ===
+        "function"
+    ){
+
+        updateGrafik();
+
+    }
+
+
+    if(
+        typeof updateGrafikPenyerapan ===
+        "function"
+    ){
+
+        updateGrafikPenyerapan();
+
+    }
+
+
+    if(
+        typeof updateDashboardNominal ===
+        "function"
+    ){
+
+        updateDashboardNominal();
+
+    }
+
+
+    alert(
+        "✅ Uraian dan Realisasi berhasil disimpan."
+    );
+
+}
+function hapusTerpilih(){
+
+    let data =
+    JSON.parse(localStorage.getItem("data")) || [];
+
+    let checkbox =
+    document.querySelectorAll(".cekHapus:checked");
+
+    if(checkbox.length == 0){
+
+        alert("Pilih data yang akan dihapus.");
+
+        return;
+
+    }
+
+    if(!confirm("Yakin ingin menghapus data yang dipilih?")){
+
+        return;
+
+    }
+
+    let indexHapus = [];
+
+    checkbox.forEach(item=>{
+
+        indexHapus.push(Number(item.value));
+
+    });
+
+    // Hapus dari belakang supaya index tidak berubah
+
+    indexHapus.sort((a,b)=>b-a);
+indexHapus.forEach(i=>{
+
+    // Kirim ke Google Spreadsheet
+    simpanKeCloud({
+
+        action:"hapus",
+
+        id:data[i].id
+
+    });
+
+    // Hapus dari localStorage
+    data.splice(i,1);
+
+});data[indexKelola] = item;
+
+localStorage.setItem(
+    "data",
+    JSON.stringify(data)
+);
+// =====================================
+// SIMPAN URAIAN KE CLOUD
+// =====================================
+
+simpanKeCloud({
+
+    action: "simpanPanel",
+
+    id: item.id,
+
+    uraian: item.uraian
+
+});
+     
+    tampilkanData();
+
+    tampilkanMonitoring();
+
+    tampilkanDashboard();
+
+    tampilkanRealisasi();
+
+    tampilkanLaporan();
+
+    updateGrafik();
+
+    updateGrafikTriwulan();
+
+    updateGrafikAnggaran();
+
+    updateGrafikPenyerapan();
+
+    sukses(
+    "Berhasil",
+    "Data berhasil dihapus."
+);
+setTimeout(()=>{
+
+    refreshDataCloud();
+
+},1000);
+}// ============================
+// CEK LOGIN SAAT HALAMAN DIBUKA
+// ============================
+window.onload = function(){
+
+    if(localStorage.getItem("login") == "true"){
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboardPage").style.display = "flex";
+
+    }
+
+    tampilkanData();
+    tampilkanRealisasi();
+    tampilkanMonitoring();
+    tampilkanLaporan();
+
+    updateGrafik();
+    updateGrafikTriwulan();
+    updateGrafikAnggaran();
+    updateGrafikPenyerapan();
+    updateDashboardNominal();
+    updateTanggalJam();
+
+    ambilDataCloud();
+
+}
+async function simpanKeCloud(data){
+
+    try{
+
+        const response = await fetch(
+            "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"text/plain;charset=utf-8"
+                },
+                body:JSON.stringify(data)
+            }
+        );
+
+        const hasil = await response.json();
+
+        console.log("Cloud :", hasil);
+
+        return hasil;
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}async function ambilDataCloud(){
+
+    try{
+
+        // =====================================
+        // SIMPAN DATA LOKAL SEBELUM DATA CLOUD MASUK
+        // =====================================
+
+        const dataLokal =
+            JSON.parse(
+                localStorage.getItem("data")
+            ) || [];
+
+
+        const response = await fetch(
+            "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec"
+        );
+
+
+        const sheet =
+            await response.json();
+
+
+        console.log("DATA CLOUD:", sheet);
+
+
+        const dataCloud = [];
+
+
+        // =====================================
+        // BACA DATA GOOGLE SHEET
+        // =====================================
+
+        for(let i = 1; i < sheet.length; i++){
+
+            // ID dari Google Sheet
+            const idCloud =
+                sheet[i][0];
+
+
+            // =================================
+            // CARI DATA LOKAL BERDASARKAN ID
+            // =================================
+
+            const dataLokalItem =
+    dataLokal.find(
+        x =>
+        String(x.id) ===
+        String(idCloud)
+    );
+
+
+            // =================================
+            // MASUKKAN DATA CLOUD
+            // =================================
+
+            dataCloud.push({
+
+                id: idCloud,
+
+                program: sheet[i][1],
+
+                kegiatan: sheet[i][2],
+
+                subKegiatan: sheet[i][3],
+
+                indikator: sheet[i][4],
+
+                target: sheet[i][5],
+
+                anggaran: sheet[i][6],
+
+                penanggungJawab: sheet[i][7],
+
+                status: sheet[i][8],
+
+
+                // =============================
+                // ANGGARAN TW I
+                // =============================
+
+                angkas1:
+                    Number(sheet[i][9] || 0),
+
+                realisasi1:
+                    Number(sheet[i][10] || 0),
+
+                persen1:
+                    Number(sheet[i][11] || 0),
+
+
+                // =============================
+                // ANGGARAN TW II
+                // =============================
+
+                angkas2:
+                    Number(sheet[i][12] || 0),
+
+                realisasi2:
+                    Number(sheet[i][13] || 0),
+
+                persen2:
+                    Number(sheet[i][14] || 0),
+
+
+                // =============================
+                // ANGGARAN TW III
+                // =============================
+
+                angkas3:
+                    Number(sheet[i][15] || 0),
+
+                realisasi3:
+                    Number(sheet[i][16] || 0),
+
+                persen3:
+                    Number(sheet[i][17] || 0),
+
+
+                // =============================
+                // ANGGARAN TW IV
+                // =============================
+
+                angkas4:
+                    Number(sheet[i][18] || 0),
+
+                realisasi4:
+                    Number(sheet[i][19] || 0),
+
+                persen4:
+                    Number(sheet[i][20] || 0),
+
+
+                // =============================
+                // DASHBOARD
+                // =============================
+
+                tw1:
+                    Number(sheet[i][11] || 0),
+
+                tw2:
+                    Number(sheet[i][14] || 0),
+
+                tw3:
+                    Number(sheet[i][17] || 0),
+
+                tw4:
+                    Number(sheet[i][20] || 0),
+
+
+                // =================================
+                // PERTAHANKAN URAIAN LOKAL
+                // =================================
+
+                uraian:
+                    dataLokalItem?.uraian || [],
+
+
+                // =================================
+                // PERTAHANKAN KINERJA TW I
+                // =================================
+
+                realisasiKinerja1:
+                    dataLokalItem?.realisasiKinerja1 || "",
+
+                persenKinerja1:
+                    Number(
+                        dataLokalItem?.persenKinerja1 || 0
+                    ),
+
+
+                // =================================
+                // PERTAHANKAN KINERJA TW II
+                // =================================
+
+                realisasiKinerja2:
+                    dataLokalItem?.realisasiKinerja2 || "",
+
+                persenKinerja2:
+                    Number(
+                        dataLokalItem?.persenKinerja2 || 0
+                    ),
+
+
+                // =================================
+                // PERTAHANKAN KINERJA TW III
+                // =================================
+
+                realisasiKinerja3:
+                    dataLokalItem?.realisasiKinerja3 || "",
+
+                persenKinerja3:
+                    Number(
+                        dataLokalItem?.persenKinerja3 || 0
+                    ),
+
+
+                // =================================
+                // PERTAHANKAN KINERJA TW IV
+                // =================================
+
+                realisasiKinerja4:
+                    dataLokalItem?.realisasiKinerja4 || "",
+
+                persenKinerja4:
+                    Number(
+                        dataLokalItem?.persenKinerja4 || 0
+                    )
+
+            });
+
+        }
+
+
+        // =====================================
+        // SIMPAN HASIL GABUNGAN
+        // =====================================
+        localStorage.setItem(
+            "data",
+            JSON.stringify(dataCloud)
+        );
+setTimeout(() => {
+
+    let cek =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
+
+}, 2000);
+        console.log(
+            "DATA SETELAH GABUNG CLOUD + LOKAL:",
+            dataCloud
+        );
+
+
+        tampilkanData();
+
+
+    }catch(err){
+
+        console.error(
+            "Gagal mengambil data cloud:",
+            err
+        );
+
+    }
+
+}
+async function refreshDataCloud(){
+
+    try{
+
+        await ambilDataCloud();
+
+        tampilkanData();
+        tampilkanRealisasi();
+        tampilkanMonitoring();
+        tampilkanLaporan();
+
+        updateGrafik();
+        updateGrafikTriwulan();
+        updateGrafikAnggaran();
+        updateGrafikPenyerapan();
+        updateDashboardNominal();
+
+    
+    }catch(err){
+
+    }
+
+}// ==============================
+// NOTIFIKASI MODERN
+// ==============================
+function sukses(judul, pesan){
+
+    Swal.fire({
+        icon: "success",
+        title: judul,
+        text: pesan,
+        confirmButtonColor: "#1e88e5",
+        confirmButtonText: "OK"
+    });
+
+}
+
+function gagal(judul, pesan){
+
+    Swal.fire({
+        icon: "error",
+        title: judul,
+        text: pesan,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK"
+    });
+
+}
+
+function info(judul, pesan){
+
+    Swal.fire({
+        icon: "info",
+        title: judul,
+        text: pesan,
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK"
+    });
+
+}
+
+function konfirmasi(judul, pesan){
+
+    return Swal.fire({
+        icon: "warning",
+        title: judul,
+        text: pesan,
+        showCancelButton: true,
+        confirmButtonText: "Ya",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33"
+    });
+
+}/*
 setInterval(function(){
 
     if(localStorage.getItem("login")=="true"){
@@ -1465,3 +3782,1253 @@ setInterval(function(){
     }
 
 },5000);
+*/
+function tambahUraian(){
+
+    let container =
+        document.getElementById("daftarUraian");
+
+    if(!container) return;
+
+
+    let nomor =
+        container.querySelectorAll(".boxUraian").length + 1;
+
+
+    let box =
+        document.createElement("div");
+
+
+    box.className = "boxUraian";
+
+
+    box.style.cssText = `
+        border:1px solid #ddd;
+        border-radius:10px;
+        padding:15px;
+        margin-bottom:15px;
+        background:#f8fafc;
+    `;
+
+
+    box.innerHTML = `
+
+        <!-- ========================= -->
+        <!-- IDENTITAS URAIAN -->
+        <!-- ========================= -->
+
+        <h4 style="margin-top:0;">
+            Uraian ${nomor}
+        </h4>
+
+
+        <div class="form-group">
+
+            <label>Keterangan / Uraian</label>
+
+            <input
+                type="text"
+                class="inputUraian"
+                placeholder="Masukkan keterangan/uraian">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Target Kinerja</label>
+
+            <input
+                type="text"
+                class="inputTargetKinerjaUraian"
+                placeholder="Contoh: 8 Dokumen">
+
+        </div>
+
+
+        <hr>
+
+
+        <!-- ========================= -->
+        <!-- TRIWULAN I -->
+        <!-- ========================= -->
+
+        <h4>Triwulan I</h4>
+
+
+        <div class="form-group">
+
+            <label>Angkas</label>
+
+            <input
+                type="text"
+                class="inputAngkasUraian tw1"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 1);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Anggaran</label>
+
+            <input
+                type="text"
+                class="inputRealisasiUraian tw1"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 1);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Anggaran</label>
+
+            <input
+                type="text"
+                class="inputPersenUraian tw1"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Kinerja</label>
+
+            <input
+                type="text"
+                class="inputRealisasiKinerjaUraian tw1"
+                placeholder="Contoh: 2 Dokumen"
+                onkeyup="
+                    hitungPersenKinerjaUraian(this, 1);
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Kinerja</label>
+
+            <input
+                type="text"
+                class="inputPersenKinerjaUraian tw1"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <hr>
+
+
+        <!-- ========================= -->
+        <!-- TRIWULAN II -->
+        <!-- ========================= -->
+
+        <h4>Triwulan II</h4>
+
+
+        <div class="form-group">
+
+            <label>Angkas</label>
+
+            <input
+                type="text"
+                class="inputAngkasUraian tw2"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 2);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Anggaran</label>
+
+            <input
+                type="text"
+                class="inputRealisasiUraian tw2"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 2);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Anggaran</label>
+
+            <input
+                type="text"
+                class="inputPersenUraian tw2"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Kinerja</label>
+
+            <input
+                type="text"
+                class="inputRealisasiKinerjaUraian tw2"
+                placeholder="Contoh: 4 Dokumen"
+                onkeyup="
+                    hitungPersenKinerjaUraian(this, 2);
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Kinerja</label>
+
+            <input
+                type="text"
+                class="inputPersenKinerjaUraian tw2"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <hr>
+
+
+        <!-- ========================= -->
+        <!-- TRIWULAN III -->
+        <!-- ========================= -->
+
+        <h4>Triwulan III</h4>
+
+
+        <div class="form-group">
+
+            <label>Angkas</label>
+
+            <input
+                type="text"
+                class="inputAngkasUraian tw3"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 3);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Anggaran</label>
+
+            <input
+                type="text"
+                class="inputRealisasiUraian tw3"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 3);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Anggaran</label>
+
+            <input
+                type="text"
+                class="inputPersenUraian tw3"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Kinerja</label>
+
+            <input
+                type="text"
+                class="inputRealisasiKinerjaUraian tw3"
+                placeholder="Contoh: 6 Dokumen"
+                onkeyup="
+                    hitungPersenKinerjaUraian(this, 3);
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Kinerja</label>
+
+            <input
+                type="text"
+                class="inputPersenKinerjaUraian tw3"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <hr>
+
+
+        <!-- ========================= -->
+        <!-- TRIWULAN IV -->
+        <!-- ========================= -->
+
+        <h4>Triwulan IV</h4>
+
+
+        <div class="form-group">
+
+            <label>Angkas</label>
+
+            <input
+                type="text"
+                class="inputAngkasUraian tw4"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 4);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Anggaran</label>
+
+            <input
+                type="text"
+                class="inputRealisasiUraian tw4"
+                placeholder="Rp 0"
+                onkeyup="
+                    formatRupiah(this);
+                    hitungPersenUraianTW(this, 4);
+                    hitungTotalUraian();
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Anggaran</label>
+
+            <input
+                type="text"
+                class="inputPersenUraian tw4"
+                value="0%"
+                readonly>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Realisasi Kinerja</label>
+
+            <input
+                type="text"
+                class="inputRealisasiKinerjaUraian tw4"
+                placeholder="Contoh: 8 Dokumen"
+                onkeyup="
+                    hitungPersenKinerjaUraian(this, 4);
+                ">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Persentase Kinerja</label>
+
+            <input
+                type="text"
+                class="inputPersenKinerjaUraian tw4"
+                value="0%"
+                readonly>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(box);
+
+}
+function hitungPersenUraianTW(input, nomorTW){
+
+    let box = input.closest(".boxUraian");
+
+    if(!box) return;
+
+    let persenInput = box.querySelector(
+        ".inputPersenUraian.tw" + nomorTW
+    );
+
+    if(!persenInput) return;
+
+
+    // ==============================
+    // CARI ANGKAS
+    // ==============================
+
+    let angkas = 0;
+
+    // Cek dari TW yang sedang dipilih
+    for(let tw = nomorTW; tw >= 1; tw--){
+
+        let angkasInput = box.querySelector(
+            ".inputAngkasUraian.tw" + tw
+        );
+
+        if(!angkasInput) continue;
+
+        let nilaiAngkas = Number(
+            angkasInput.value.replace(/[^0-9]/g, "")
+        ) || 0;
+
+        if(nilaiAngkas > 0){
+
+            angkas = nilaiAngkas;
+
+            break;
+
+        }
+
+    }
+
+
+    // ==============================
+    // AMBIL REALISASI
+    // ==============================
+
+    let realisasi = Number(
+        input.value.replace(/[^0-9]/g, "")
+    ) || 0;
+
+
+    // ==============================
+    // HITUNG PERSENTASE
+    // ==============================
+
+    let persen = 0;
+
+    if(angkas > 0){
+
+        persen = Math.round(
+            (realisasi / angkas) * 100
+        );
+
+    }
+
+
+    // ==============================
+    // TAMPILKAN
+    // ==============================
+
+    persenInput.value =
+        persen + "%";
+
+
+    // ==============================
+    // UPDATE TOTAL
+    // ==============================
+
+    hitungTotalUraian();
+
+}
+function hitungPersenUraian(input){
+
+    let box = input.closest(".boxUraian");
+
+    if(!box) return;
+
+    let angkas = Number(
+        box.querySelector(".inputAngkasUraian")
+        .value
+        .replace(/\./g,"")
+        .replace(/[^0-9]/g,"")
+    ) || 0;
+
+    let realisasi = Number(
+        input.value
+        .replace(/\./g,"")
+        .replace(/[^0-9]/g,"")
+    ) || 0;
+
+    let persen = 0;
+
+    if(angkas > 0){
+
+        persen =
+            Math.round(
+                (realisasi / angkas) * 100
+            );
+
+    }
+
+    box.querySelector(
+        ".inputPersenUraian"
+    ).value = persen + "%";
+hitungTotalUraian();
+}function hitungTotalUraian(){
+
+    let semuaUraian =
+        document.querySelectorAll(".boxUraian");
+
+    let total = {
+        tw1: { angkas: 0, realisasi: 0, dasarAngkas: 0 },
+        tw2: { angkas: 0, realisasi: 0, dasarAngkas: 0 },
+        tw3: { angkas: 0, realisasi: 0, dasarAngkas: 0 },
+        tw4: { angkas: 0, realisasi: 0, dasarAngkas: 0 }
+    };
+
+
+    semuaUraian.forEach(box => {
+
+        for(let tw = 1; tw <= 4; tw++){
+
+            // ==================================
+            // ANGKAS YANG BENAR-BENAR DIINPUT
+            // PADA TW TERSEBUT
+            // ==================================
+
+            let angkasInput =
+                box.querySelector(
+                    ".inputAngkasUraian.tw" + tw
+                );
+
+            let angkasSaatIni = Number(
+                (angkasInput?.value || "")
+                .replace(/[^0-9]/g,"")
+            ) || 0;
+
+
+            // ==================================
+            // CARI ANGKAS TERAKHIR UNTUK DASAR
+            // PERSENTASE
+            // ==================================
+
+            let dasarAngkas = 0;
+
+            for(let cariTW = tw; cariTW >= 1; cariTW--){
+
+                let inputDasar =
+                    box.querySelector(
+                        ".inputAngkasUraian.tw" + cariTW
+                    );
+
+                if(!inputDasar) continue;
+
+                let nilaiDasar = Number(
+                    inputDasar.value
+                    .replace(/[^0-9]/g,"")
+                ) || 0;
+
+                if(nilaiDasar > 0){
+
+                    dasarAngkas = nilaiDasar;
+
+                    break;
+
+                }
+
+            }
+
+
+            // ==================================
+            // REALISASI TW BERJALAN
+            // ==================================
+
+            let realisasiInput =
+                box.querySelector(
+                    ".inputRealisasiUraian.tw" + tw
+                );
+
+            let realisasi = Number(
+                (realisasiInput?.value || "")
+                .replace(/[^0-9]/g,"")
+            ) || 0;
+
+
+            // ==================================
+            // TOTAL
+            // ==================================
+
+            total["tw"+tw].angkas +=
+                angkasSaatIni;
+
+            total["tw"+tw].realisasi +=
+                realisasi;
+
+            total["tw"+tw].dasarAngkas +=
+                dasarAngkas;
+
+        }
+
+    });
+
+
+    // ==========================================
+    // TAMPILKAN TOTAL
+    // ==========================================
+
+    let totalEl =
+        document.getElementById("totalUraian");
+
+    if(!totalEl) return;
+
+
+    let html = `
+
+        <div style="
+            margin-top:20px;
+            padding:15px;
+            border-radius:10px;
+            background:#eef6ff;
+            border:1px solid #cfe3ff;
+        ">
+
+        <h4 style="margin-top:0;">
+            📊 TOTAL REALISASI PER TRIWULAN
+        </h4>
+
+    `;
+
+
+    for(let tw = 1; tw <= 4; tw++){
+
+        let angkas =
+            total["tw"+tw].angkas;
+
+        let realisasi =
+            total["tw"+tw].realisasi;
+
+        let dasarAngkas =
+            total["tw"+tw].dasarAngkas;
+
+
+        let persen = 0;
+
+        if(dasarAngkas > 0){
+
+            persen =
+                Math.round(
+                    (realisasi / dasarAngkas) * 100
+                );
+
+        }
+
+
+        html += `
+
+            <div style="
+                margin-top:12px;
+                padding:12px;
+                background:white;
+                border-radius:8px;
+            ">
+
+                <strong>Triwulan ${tw}</strong>
+
+                <div>
+                    Angkas:
+                    <strong>
+                        Rp ${angkas.toLocaleString("id-ID")}
+                    </strong>
+                </div>
+
+                <div>
+                    Realisasi:
+                    <strong>
+                        Rp ${realisasi.toLocaleString("id-ID")}
+                    </strong>
+                </div>
+
+                <div>
+                    Persentase:
+                    <strong>
+                        ${persen}%
+                    </strong>
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    html += `</div>`;
+
+    totalEl.innerHTML = html;
+
+}
+function hitungMonitoringUraian(item){
+
+    let hasil = {
+
+        tw1: {
+            angkas: 0,
+            realisasi: 0,
+            persen: 0
+        },
+
+        tw2: {
+            angkas: 0,
+            realisasi: 0,
+            persen: 0
+        },
+
+        tw3: {
+            angkas: 0,
+            realisasi: 0,
+            persen: 0
+        },
+
+        tw4: {
+            angkas: 0,
+            realisasi: 0,
+            persen: 0
+        }
+
+    };
+
+
+    // ==========================================
+    // AMBIL SEMUA URAIAN
+    // ==========================================
+
+    let daftarUraian =
+        item.uraian || [];
+
+
+    daftarUraian.forEach(uraian => {
+
+
+        // ======================================
+        // HITUNG TW I - IV
+        // ======================================
+
+        for(let tw = 1; tw <= 4; tw++){
+
+            let angkas = 0;
+
+
+            // ==================================
+            // CARI ANGKAS TERAKHIR
+            // ==================================
+
+            for(let cariTW = tw; cariTW >= 1; cariTW--){
+
+                let dataTW =
+                    uraian["tw"+cariTW];
+
+                if(!dataTW) continue;
+
+
+                let nilaiAngkas =
+                    Number(dataTW.angkas || 0);
+
+
+                if(nilaiAngkas > 0){
+
+                    angkas =
+                        nilaiAngkas;
+
+                    break;
+
+                }
+
+            }
+
+
+            // ==================================
+            // REALISASI TW BERJALAN
+            // ==================================
+
+            let dataRealisasi =
+                uraian["tw"+tw] || {};
+
+
+            let realisasi =
+                Number(
+                    dataRealisasi.realisasi || 0
+                );
+
+
+            // ==================================
+            // TAMBAHKAN KE TOTAL
+            // ==================================
+
+            hasil["tw"+tw].angkas +=
+                angkas;
+
+            hasil["tw"+tw].realisasi +=
+                realisasi;
+
+        }
+
+    });
+
+
+    // ==========================================
+    // HITUNG PERSENTASE
+    // ==========================================
+
+    for(let tw = 1; tw <= 4; tw++){
+
+        let angkas =
+            hasil["tw"+tw].angkas;
+
+        let realisasi =
+            hasil["tw"+tw].realisasi;
+
+
+        if(angkas > 0){
+
+            hasil["tw"+tw].persen =
+                Math.round(
+                    (realisasi / angkas) * 100
+                );
+
+        }else{
+
+            hasil["tw"+tw].persen = 0;
+
+        }
+
+    }
+
+
+    return hasil;
+
+}
+async function simpanUraian(){
+
+    if(indexKelola == -1){
+
+        alert("Silakan pilih data terlebih dahulu.");
+        return;
+
+    }
+
+    let data =
+        JSON.parse(localStorage.getItem("data")) || [];
+
+    let item = data[indexKelola];
+
+    let daftar = [];
+
+    document.querySelectorAll(".boxUraian").forEach(box => {
+
+        let keterangan =
+            box.querySelector(".inputUraian").value.trim();
+
+        let uraian = {
+
+            keterangan: keterangan,
+
+            tw1: {
+                angkas: 0,
+                realisasi: 0,
+                persen: 0
+            },
+
+            tw2: {
+                angkas: 0,
+                realisasi: 0,
+                persen: 0
+            },
+
+            tw3: {
+                angkas: 0,
+                realisasi: 0,
+                persen: 0
+            },
+
+            tw4: {
+                angkas: 0,
+                realisasi: 0,
+                persen: 0
+            }
+
+        };
+
+
+        // ==========================
+        // AMBIL DATA TW I - IV
+        // ==========================
+
+        for(let tw = 1; tw <= 4; tw++){
+
+            let angkasInput =
+                box.querySelector(
+                    ".inputAngkasUraian.tw" + tw
+                );
+
+            let realisasiInput =
+                box.querySelector(
+                    ".inputRealisasiUraian.tw" + tw
+                );
+
+            let persenInput =
+                box.querySelector(
+                    ".inputPersenUraian.tw" + tw
+                );
+
+
+            let angkas = Number(
+                (angkasInput?.value || "")
+                .replace(/[^0-9]/g,"")
+            ) || 0;
+
+            let realisasi = Number(
+                (realisasiInput?.value || "")
+                .replace(/[^0-9]/g,"")
+            ) || 0;
+
+
+            let persen = 0;
+
+            if(angkas > 0){
+
+                persen =
+                    Math.round(
+                        (realisasi / angkas) * 100
+                    );
+
+            }
+
+
+            uraian["tw"+tw] = {
+
+                angkas: angkas,
+
+                realisasi: realisasi,
+
+                persen: persen
+
+            };
+
+        }
+
+
+        daftar.push(uraian);
+
+    });
+
+
+    // ==========================
+    // SIMPAN KE LOCAL STORAGE
+    // ==========================
+
+    item.uraian = daftar;
+
+    data[indexKelola] = item;
+
+    localStorage.setItem(
+        "data",
+        JSON.stringify(data)
+    );
+
+
+    // ==========================
+    // KIRIM KE GOOGLE SHEET
+    // ==========================
+
+    try{
+
+        const response = await fetch(
+            "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                    "text/plain;charset=utf-8"
+                },
+
+                body: JSON.stringify({
+
+                    action: "simpanUraian",
+
+                    id: item.id,
+
+                    uraianData: JSON.stringify(daftar)
+
+                })
+
+            }
+        );
+
+
+        const hasil =
+            await response.text();
+
+        console.log(
+            "Respon Cloud:",
+            hasil
+        );
+
+
+        alert(
+            "✅ Uraian berhasil disimpan ke SIPANDAKU dan Cloud."
+        );
+
+
+    }catch(err){
+
+        console.error(err);
+    }
+
+}function hitungPersenKinerjaPanel(){
+
+    let target =
+        document.getElementById("formTarget").value;
+
+    let realisasi =
+        document.getElementById(
+            "formRealisasiKinerja"
+        ).value;
+
+    let angkaTarget =
+        parseFloat(
+            target.replace(/[^0-9]/g,"")
+        ) || 0;
+
+    let angkaRealisasi =
+        parseFloat(
+            realisasi.replace(/[^0-9]/g,"")
+        ) || 0;
+
+    let persen = 0;
+
+    if(angkaTarget > 0){
+
+        persen =
+            Math.round(
+                (angkaRealisasi / angkaTarget) * 100
+            );
+
+    }
+
+    let hasil =
+        document.getElementById(
+            "persenKinerjaForm"
+        );
+
+    if(hasil){
+
+        hasil.innerHTML =
+            persen + "%";
+
+    }
+
+}
+function hitungPersenKinerjaTW(nomorTW){
+
+    let targetEl =
+        document.getElementById("formTarget");
+
+    let realisasiEl =
+        document.getElementById(
+            "formRealisasiKinerja" + nomorTW
+        );
+        if(nomorTW === 1){
+
+}
+
+    let persenEl =
+        document.getElementById(
+            "persenKinerjaForm" + nomorTW
+        );
+
+
+    if(!targetEl || !realisasiEl || !persenEl){
+        return;
+    }
+
+
+    let target =
+        targetEl.value || "";
+
+    let realisasi =
+        realisasiEl.value || "";
+
+
+    let angkaTarget =
+        parseFloat(
+            target.replace(/[^0-9]/g,"")
+        ) || 0;
+
+
+    let angkaRealisasi =
+        parseFloat(
+            realisasi.replace(/[^0-9]/g,"")
+        ) || 0;
+
+
+    let persen = 0;
+
+
+    if(angkaTarget > 0){
+
+        persen =
+            Math.round(
+                (angkaRealisasi / angkaTarget) * 100
+            );
+
+    }
+
+
+    persenEl.innerHTML =
+        persen + "%";
+
+}function testTambahUraian(){
+
+    alert("✅ Tombol Tambah Uraian berhasil dipanggil.");
+
+}
+function hitungPersenKinerjaUraian(input, nomorTW){
+
+    let box =
+        input.closest(".boxUraian");
+
+    if(!box) return;
+
+
+    // ==============================
+    // AMBIL TARGET KINERJA
+    // ==============================
+
+    let targetInput =
+        box.querySelector(
+            ".inputTargetKinerjaUraian"
+        );
+
+
+    // ==============================
+    // AMBIL OUTPUT PERSENTASE
+    // ==============================
+
+    let persenInput =
+        box.querySelector(
+            ".inputPersenKinerjaUraian.tw" +
+            nomorTW
+        );
+
+
+    if(!targetInput || !persenInput){
+        return;
+    }
+
+
+    let target =
+        targetInput.value || "";
+
+
+    let realisasi =
+        input.value || "";
+
+
+    // ==============================
+    // AMBIL ANGKA
+    // ==============================
+
+    let angkaTarget =
+        parseFloat(
+            target.replace(
+                /[^0-9]/g,
+                ""
+            )
+        ) || 0;
+
+
+    let angkaRealisasi =
+        parseFloat(
+            realisasi.replace(
+                /[^0-9]/g,
+                ""
+            )
+        ) || 0;
+
+
+    let persen = 0;
+
+
+    // ==============================
+    // HITUNG
+    // ==============================
+
+    if(angkaTarget > 0){
+
+        persen =
+            Math.round(
+                (
+                    angkaRealisasi /
+                    angkaTarget
+                ) * 100
+            );
+
+    }
+
+
+    // ==============================
+    // TAMPILKAN
+    // ==============================
+
+    persenInput.value =
+        persen + "%";
+
+}function tutupPanelInput(){
+
+    const panel =
+        document.getElementById("panelInput");
+
+    if(panel){
+
+        panel.style.display = "none";
+
+    }
+
+    // Bersihkan pilihan Kelola
+    indexKelola = -1;
+
+}
