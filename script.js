@@ -403,7 +403,17 @@ ${item.program}
 <td>${item.target || "-"}</td>
 <td>Rp ${Number(item.anggaran).toLocaleString("id-ID")}</td>
 <td>${item.penanggungJawab || ""}</td>
-<td>${item.status || ""}</td>
+<td>
+    ${
+        item.status === "Selesai"
+        ? '<span class="status-badge selesai">🟢 Selesai</span>'
+
+        : item.status === "Berjalan"
+        ? '<span class="status-badge berjalan">🟡 Berjalan</span>'
+
+        : '<span class="status-badge belum">🔴 Belum</span>'
+    }
+</td>
 </tr>
 `;
 
@@ -775,6 +785,7 @@ localStorage.getItem("data")
 )
 );
 }}
+
 let chartProgram;
 
 function updateGrafik(){
@@ -2850,71 +2861,144 @@ onclick="bukaKelola(${index})">
 });
 
 }
-function simpanTW1(index){
+async function simpanTW1(index){
+    alert("SIMPAN TW1 TERPANGGIL");
+    let data =
+        JSON.parse(
+            localStorage.getItem("data")
+        ) || [];
 
-    let data = JSON.parse(localStorage.getItem("data")) || [];
 
     let angkas = Number(
-        (document.getElementById("angkas1_"+index).value || "0")
-        .replace(/\./g,"")
+        (
+            document.getElementById(
+                "angkas1_" + index
+            ).value || "0"
+        ).replace(/\./g,"")
     );
 
+
     let realisasi = Number(
-        (document.getElementById("realisasi1_"+index).value || "0")
-        .replace(/\./g,"")
+        (
+            document.getElementById(
+                "realisasi1_" + index
+            ).value || "0"
+        ).replace(/\./g,"")
     );
+
 
     let persen = 0;
 
     if(angkas > 0){
-        persen = Math.round((realisasi / angkas) * 100);
+
+        persen =
+            Math.round(
+                (realisasi / angkas) * 100
+            );
+
     }
 
-    data[index].angkas1 = angkas;
-    data[index].realisasi1 = realisasi;
-    data[index].persen1 = persen;
 
-    // dipakai dashboard lama
-    data[index].tw1 = persen;
+    // ==============================
+    // UPDATE DATA LOKAL
+    // ==============================
 
-    localStorage.setItem("data", JSON.stringify(data));
-    simpanKeCloud({
+    data[index].angkas1 =
+        angkas;
 
-    action:"simpanTW1",
+    data[index].realisasi1 =
+        realisasi;
 
-    id:data[index].id,
+    data[index].persen1 =
+        persen;
 
-    angkas1:angkas,
+    data[index].tw1 =
+        persen;
 
-    realisasi1:realisasi,
 
-    persen1:persen
+    localStorage.setItem(
+        "data",
+        JSON.stringify(data)
+    );
 
-});
 
-    simpanKeCloud({
+    // ==============================
+    // SIMPAN KE GOOGLE SHEET
+    // ==============================
+const hasil =
+    await simpanKeCloud({
+        
 
-    action:"simpanTW1",
+        action:
+            "simpanTW1",
 
-    id:data[index].id,
+        id:
+            data[index].id,
 
-    angkas1:angkas,
+        angkas1:
+            angkas,
 
-    realisasi1:realisasi,
+        realisasi1:
+            realisasi,
 
-    persen1:persen
+        persen1:
+            persen
 
-});
+    });
+    console.log("HASIL SIMPAN TW1:", hasil);
+alert(
+    "HASIL SERVER:\n" +
+    JSON.stringify(hasil)
+);
 
-    document.getElementById("persen1_"+index).innerHTML = persen + "%";
 
-   tampilkanData();
-tampilkanRealisasi();
-tampilkanMonitoring();
-tampilkanLaporan();
-updateGrafik();
-updateGrafikPenyerapan();
-    alert("Realisasi TW I berhasil disimpan");
+if(!hasil || !hasil.success){
+
+    alert(
+        "❌ Realisasi gagal disimpan:\n" +
+        (
+            hasil?.message ||
+            "Tidak ada respons dari server"
+        )
+    );
+
+    return;
+
+}
+
+
+    console.log(
+        "Hasil simpan TW I:",
+        hasil
+    );
+
+
+    // ==============================
+    // UPDATE TAMPILAN
+    // ==============================
+
+    document.getElementById(
+        "persen1_" + index
+    ).innerHTML =
+        persen + "%";
+
+
+    tampilkanData();
+
+    tampilkanRealisasi();
+
+    tampilkanMonitoring();
+
+    tampilkanLaporan();
+
+    updateGrafik();
+
+    updateGrafikPenyerapan();
+
+
+    alert(
+        "✅ Realisasi TW I berhasil disimpan ke Cloud"
+    );
 
 }function simpanTW2(index){
 
@@ -2991,7 +3075,9 @@ tampilkanMonitoring();
 tampilkanLaporan();
 updateGrafik();
 
-    alert("Realisasi TW III berhasil disimpan");
+
+
+alert("Realisasi TW III berhasil disimpan");
 
 }function simpanTW4(index){
 
@@ -3029,7 +3115,9 @@ tampilkanMonitoring();
 tampilkanLaporan();
 updateGrafik();
 
-    alert("Realisasi TW IV berhasil disimpan");
+
+
+alert("Realisasi TW IV berhasil disimpan");
 
 }let indexKelola = -1;function bukaKelola(index){
 
@@ -3526,7 +3614,7 @@ function loadDataTriwulan(){
     tutupKelola();
        */
 }
-function simpanPanel(){
+async function simpanPanel(){
 
     if(indexKelola == -1){
 
@@ -3822,8 +3910,8 @@ function simpanPanel(){
     // =====================================
     // SIMPAN KE CLOUD
     // =====================================
-
-    simpanKeCloud({
+const hasil =
+    await simpanKeCloud({
 
         action: "simpanPanel",
 
@@ -3832,6 +3920,21 @@ function simpanPanel(){
         uraian: item.uraian
 
     });
+
+
+if(!hasil || !hasil.success){
+
+    alert(
+        "❌ Gagal menyimpan ke Cloud:\n" +
+        (
+            hasil?.message ||
+            "Tidak ada respons dari server"
+        )
+    );
+
+    return;
+
+}
 
 
     // =====================================
@@ -3883,6 +3986,7 @@ function simpanPanel(){
         updateDashboardNominal();
 
     }
+    
 
 
     alert(
@@ -4019,26 +4123,52 @@ async function simpanKeCloud(data){
             "https://script.google.com/macros/s/AKfycbzpTq0gjEP1wvgoX9e3VvZ3bCx2gHYGEZSACjYBO5gBCcEg-DLG-HY62RAbDbPdM0VK/exec",
             {
                 method:"POST",
+
                 headers:{
-                    "Content-Type":"text/plain;charset=utf-8"
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
                 },
-                body:JSON.stringify(data)
+
+                body:
+                    JSON.stringify(data)
             }
         );
 
-        const hasil = await response.json();
 
-        console.log("Cloud :", hasil);
+        const hasil =
+            await response.json();
+
+
+        console.log(
+            "Cloud :",
+            hasil
+        );
+
 
         return hasil;
 
+
     }catch(err){
 
-        console.error(err);
+        console.error(
+            "Gagal simpan Cloud:",
+            err
+        );
+
+
+        return {
+
+            success:false,
+
+            message:
+                err.toString()
+
+        };
 
     }
 
-}async function ambilDataCloud(){
+}
+async function ambilDataCloud(){
 
     try{
 
@@ -4274,6 +4404,11 @@ setTimeout(() => {
 
 
         tampilkanData();
+
+// =====================================
+// UPDATE PROGRESS PENYERAPAN
+// SETELAH DATA CLOUD MASUK
+// =====================================
 
 
     }catch(err){
@@ -5350,7 +5485,67 @@ async function simpanUraian(){
     item.uraian = daftar;
 
     data[indexKelola] = item;
+// =====================================
+// STATUS OTOMATIS BERDASARKAN REALISASI
+// =====================================
 
+let totalRealisasi = 0;
+
+daftarUraian.forEach(uraian => {
+
+    totalRealisasi +=
+        Number(
+            uraian.tw1?.realisasi || 0
+        );
+
+    totalRealisasi +=
+        Number(
+            uraian.tw2?.realisasi || 0
+        );
+
+    totalRealisasi +=
+        Number(
+            uraian.tw3?.realisasi || 0
+        );
+
+    totalRealisasi +=
+        Number(
+            uraian.tw4?.realisasi || 0
+        );
+
+});
+
+let pagu =
+    Number(
+        String(
+            item.anggaran || 0
+        ).replace(
+            /[^0-9]/g,
+            ""
+        )
+    ) || 0;
+
+
+if(totalRealisasi <= 0){
+
+    item.status = "Belum";
+
+}else if(
+    pagu > 0 &&
+    totalRealisasi >= pagu
+){
+
+    item.status = "Selesai";
+
+}else{
+
+    item.status = "Berjalan";
+
+}
+
+
+data[indexKelola] =
+    item;
     localStorage.setItem(
         "data",
         JSON.stringify(data)

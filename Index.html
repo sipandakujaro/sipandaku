@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>SIPANDAKU</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginPage" class="login-page">
+
+    <div class="login-card">
+
+        <img src="pag.jpg" class="logo">
+
+        <h1>SIPANDAKU</h1>
+
+        <p>
+        Sistem Informasi Perencanaan dan
+        Administrasi Keuangan Kecamatan
+        </p>
+
+        <input
+        type="text"
+        id="username"
+        placeholder="Username">
+
+        <input
+        type="password"
+        id="password"
+        placeholder="Password">
+
+        <button onclick="login()">
+
+        Login
+
+        </button>
+
+    </div>
+
+</div>
+<div class="header-kecamatan">
+
+<img
+src="pag.jpg"
+class="logo-header">
+
+<div>
+
+<h2>
+KECAMATAN JARO
+</h2>
+
+<p>
+Kabupaten Tabalong
+</p>
+
+</div>
+
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboardPage" style="display:none;">
+
+    <div class="sidebar">
+
+        <h2>SIPANDAKU</h2>
+
+        <ul>
+
+            <li onclick="showPage('dashboard')">
+🏠 Dashboard
+</li>
+
+<li onclick="showPage('perencanaan')">
+📝 Perencanaan
+</li>
+
+<li onclick="showPage('monitoring')">
+📊 Monitoring
+</li>
+<li onclick="showPage('dokumen')">
+📂 Dokumen
+</li>
+<li onclick="showPage('laporan')">
+📑 Laporan
+</li>
+<li onclick="logout()">
+🚪 Logout
+</li>
+        </ul>
+
+    </div>
+
+    <div class="main">
+
+        <!-- DASHBOARD -->
+
+       <div id="dashboard">
+<div class="dashboard-header">
+
+    <h1>Dashboard SIPANDAKU</h1>
+
+    <div class="info-box">
+
+        <div class="user-info">
+
+            🟢 <span id="userRole">
+            Login sebagai :
+            </span>
+
+        </div>
+
+        <div class="time-info">
+
+            📅 <span id="tanggalJam">
+            Tanggal & Jam
+            </span>
+
+        </div>
+
+        <div
+id="welcomeRole"
+class="welcome-mini">
+
+🎯 SIPANDAKU Kecamatan Jaro
+
+</div>
+    </div>
+
+</div>
+<div class="welcome-box">
+
+    <div class="welcome-left">
+
+        <h2>👋 Selamat Datang</h2>
+
+        <p>
+            SIPANDAKU (Sistem Informasi Perencanaan dan Administrasi Keuangan Kecamatan)
+        </p>
+
+    </div>
+
+</div>
+<div class="executive-box">
+
+    <h2>🏛 Dashboard Pimpinan</h2>
+
+    <div class="status-grid">
+
+        <div class="status-card hijau">
+            <h3>🟢 Baik</h3>
+            <h1 id="statusBaik">0</h1>
+        </div>
+
+        <div class="status-card kuning">
+            <h3>🟡 Berjalan</h3>
+            <h1 id="statusBerjalan">0</h1>
+        </div>
+
+        <div class="status-card merah">
+            <h3>🔴 Belum</h3>
+            <h1 id="statusBelum">0</h1>
+        </div>
+
+    </div>
+
+</div>
+<div class="card">
+
+<h3>Notifikasi</h3>
+
+<h1 id="notifikasi">
+- 
+</h1>
+
+</div>
+<div class="cards">
+
+<div class="card ringkasan">
+
+    <span>📋</span>
+
+    <h3>Total Program</h3>
+
+    <h2 id="totalProgram">0</h2>
+
+</div>
+
+<div class="card ringkasan">
+
+    <span>🗂️</span>
+
+    <h3>Total Kegiatan</h3>
+
+    <h2 id="totalKegiatan">0</h2>
+
+</div>
+
+<div class="card ringkasan">
+
+    <span>📑</span>
+
+    <h3>Sub Kegiatan</h3>
+
+    <h2 id="totalSubKegiatan">0</h2>
+
+</div>
+
+<div class="card ringkasan">
+
+    <span>💰</span>
+
+    <h3>Total Anggaran</h3>
+
+    <h2 id="totalAnggaran">Rp 0</h2>
+
+</div>
+
+</div>
+
+<!-- PANEL MONITORING TRIWULAN -->
+
+<div class="dashboard-row">
+
+    <div class="chart-box">
+
+        <h3>📈 Kinerja Per Triwulan</h3>
+
+        <canvas id="grafikTriwulan"></canvas>
+
+    </div>
+
+    <div class="chart-box">
+
+        <h3>💰 Penyerapan Anggaran</h3>
+
+        <canvas id="grafikPenyerapan"></canvas>
+
+    </div>
+
+</div>
+
+<!-- PANEL RINGKASAN -->
+
+<div class="dashboard-row">
+
+    <div class="tw-card">
+
+   <h3>TW I</h3>
+
+   <h1 id="cardTW1">0%</h1>
+
+</div>
+
+<div class="tw-card">
+
+   <h3>TW II</h3>
+
+   <h1 id="cardTW2">0%</h1>
+
+</div>
+
+<div class="tw-card">
+
+   <h3>TW III</h3>
+
+   <h1 id="cardTW3">0%</h1>
+
+</div>
+
+<div class="tw-card">
+
+   <h3>TW IV</h3>
+
+   <h1 id="cardTW4">0%</h1>
+
+</div>
+
+</div> <!-- penutup dashboard-row -->
+
+<!-- PANEL INDIKATOR KINERJA -->
+
+<div class="indikator-panel">
+
+    <!-- INDIKATOR -->
+    <div class="indikator-box">
+
+        <h3>📋 Indikator</h3>
+
+        <table class="indikator-table">
+
+            <tr>
+                <td>Jumlah Program</td>
+                <td id="indProgram">0</td>
+            </tr>
+
+            <tr>
+                <td>Jumlah Kegiatan</td>
+                <td id="indKegiatan">0</td>
+            </tr>
+
+            <tr>
+                <td>Jumlah Sub Kegiatan</td>
+                <td id="indSubKegiatan">0</td>
+            </tr>
+
+            <tr>
+                <td>Total Pagu Anggaran</td>
+                <td id="indPagu">Rp 0</td>
+            </tr>
+
+            <tr>
+                <td>Realisasi TW I</td>
+                <td id="tw1Nominal">Rp 0</td>
+            </tr>
+
+            <tr>
+                <td>Realisasi TW II</td>
+                <td id="tw2Nominal">Rp 0</td>
+            </tr>
+
+            <tr>
+                <td>Realisasi TW III</td>
+                <td id="tw3Nominal">Rp 0</td>
+            </tr>
+
+            <tr>
+                <td>Realisasi TW IV</td>
+                <td id="tw4Nominal">Rp 0</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- KINERJA -->
+    <div class="indikator-box">
+
+        <h3>📈 Kinerja Per Triwulan</h3>
+
+        <table class="indikator-table">
+
+            <tr>
+                <td>TW I</td>
+                <td id="tw1Persen">0%</td>
+            </tr>
+
+            <tr>
+                <td>TW II</td>
+                <td id="tw2Persen">0%</td>
+            </tr>
+
+            <tr>
+                <td>TW III</td>
+                <td id="tw3Persen">0%</td>
+            </tr>
+
+            <tr>
+                <td>TW IV</td>
+                <td id="tw4Persen">0%</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- PENYERAPAN -->
+    <div class="indikator-box">
+
+        <h3>💰 Penyerapan Anggaran</h3>
+
+        <table class="indikator-table">
+
+            <tr>
+                <td>TW I</td>
+                <td id="serapanTW1">0%</td>
+            </tr>
+
+            <tr>
+                <td>TW II</td>
+                <td id="serapanTW2">0%</td>
+            </tr>
+
+            <tr>
+                <td>TW III</td>
+                <td id="serapanTW3">0%</td>
+            </tr>
+
+            <tr>
+                <td>TW IV</td>
+                <td id="serapanTW4">0%</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+        </div>
+
+        <!-- PERENCANAAN -->
+<!-- ================= MENU PERENCANAAN ================= -->
+<div id="perencanaan" style="display:none;">
+
+    <!-- isi perencanaan -->
+<h1>📝 Menu Perencanaan</h1>
+
+<div class="tab-menu">
+
+<button
+class="tab-btn active"
+onclick="showPerencanaan('dataPerencanaan')">
+
+📋 Data Perencanaan
+
+</button>
+
+<button
+class="tab-btn"
+onclick="showPerencanaan('realisasiTriwulan')">
+
+📊 Input Realisasi Triwulan
+
+</button>
+
+</div>
+
+<!-- ================= DATA PERENCANAAN ================= -->
+<div id="dataPerencanaan">
+<h2>📋 Form Input Perencanaan</h2>
+
+<div class="form-perencanaan">
+
+    <div class="form-group">
+        <label>Program</label>
+        <input type="text" id="program" placeholder="Masukkan Program">
+    </div>
+
+    <div class="form-group">
+        <label>Kegiatan</label>
+        <input type="text" id="kegiatan" placeholder="Masukkan Kegiatan">
+    </div>
+
+    <div class="form-group">
+        <label>Sub Kegiatan</label>
+        <input type="text" id="subKegiatan" placeholder="Masukkan Sub Kegiatan">
+    </div>
+
+    <div class="form-group">
+        <label>Indikator Kinerja</label>
+        <input type="text" id="indikator" placeholder="Masukkan Indikator">
+    </div>
+
+    <div class="form-group">
+        <label>Target</label>
+        <input type="text"
+               id="target"
+               placeholder="Contoh : 8 Dokumen / 40 Laporan">
+    </div>
+
+    <div class="form-group">
+        <label>Pagu Anggaran</label>
+        <input type="text"
+               id="anggaran"
+               placeholder="Masukkan Anggaran"
+               onkeyup="formatRupiah(this)">
+    </div>
+
+    <div class="form-group">
+        <label>Penanggung Jawab</label>
+        <input type="text"
+               id="penanggungJawab"
+               placeholder="Masukkan Penanggung Jawab">
+    </div>
+
+    <div class="form-group">
+        <label>Status</label>
+        <select id="status">
+            <option value="Belum">Belum</option>
+            <option value="Berjalan">Berjalan</option>
+            <option value="Selesai">Selesai</option>
+        </select>
+    </div>
+
+</div>
+<div class="aksi-perencanaan">
+
+    <button onclick="simpanData()">
+        💾 Simpan
+    </button>
+
+    <button onclick="editDataTerpilih()">
+        ✏ Edit
+    </button>
+
+    <button onclick="refreshDataCloud()">
+        🔄 Refresh Data
+    </button>
+
+    <button onclick="exportExcel()">
+        📊 Excel
+    </button>
+
+    <button onclick="cetakPDF()">
+        📄 PDF
+    </button>
+
+    <button
+        id="btnHapusTerpilih"
+        class="btn-hapus"
+        onclick="hapusTerpilih()">
+
+        🗑 Hapus Terpilih
+
+    </button>
+
+</div>
+
+<br><br>
+
+<table id="tabelData">
+
+<thead>
+<tr>
+    <th style="width:35px;">Pilih</th>
+<th style="width:60px;">No</th>
+<th>Program</th>
+
+<th>Kegiatan</th>
+
+<th>Sub Kegiatan</th>
+
+<th>Indikator Kinerja</th>
+
+<th>Target Kinerja</th>
+
+<th>Pagu Anggaran</th>
+
+<th>Penanggung Jawab</th>
+
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- ================= REALISASI TRIWULAN ================= -->
+
+<div
+id="realisasiTriwulan"
+style="display:none;">
+
+<h2>📊 Input Realisasi Triwulan</h2>
+
+<div class="realisasi-container">
+
+    <div class="realisasi-list">
+
+        <table id="tabelRealisasi">
+
+            <thead>
+
+                <tr>
+
+                    <th width="60">No</th>
+                    <th width="220">Program</th>
+                    <th width="260">Sub Kegiatan</th>
+                    <th width="120">Target</th>
+                    <th width="120">Indikator</th>
+                    <th width="170">Pagu</th>
+                    <th width="120">Status</th>
+                    <th width="120">Kelola</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+    </div>
+    <div
+    class="realisasi-form"
+    id="panelInput"
+    style="display:none;">
+
+    <h3>📝 Form Input Realisasi</h3>
+
+    <hr>
+
+    <div class="form-group">
+
+        <label>Program</label>
+
+        <input
+            type="text"
+            id="formProgram"
+            readonly>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Sub Kegiatan</label>
+
+        <input
+            type="text"
+            id="formSubKegiatan"
+            readonly>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Indikator</label>
+
+        <input
+            type="text"
+            id="formIndikator"
+            readonly>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Target Kinerja</label>
+
+        <input
+            type="text"
+            id="formTarget"
+            readonly>
+
+    </div>
+
+
+    <!-- PERIODE -->
+
+    <div class="form-group">
+
+        <label>Periode Realisasi</label>
+
+        <div style="
+            padding:12px;
+            background:#eef6ff;
+            border-radius:8px;
+            color:#2563eb;
+            font-size:14px;
+        ">
+            Seluruh data Triwulan I sampai IV
+            ditampilkan dalam satu panel.
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- URAIAN -->
+
+   <div id="daftarUraian" style="margin-top:20px;"></div>
+
+<div id="totalUraian"></div>
+
+<button
+    type="button"
+    onclick="tambahUraian()"
+    style="margin-top:10px;">
+
+    + Tambah Uraian
+
+</button>
+
+<hr>
+
+<button
+    id="btnSimpanPanel"
+    class="btn-kelola"
+    onclick="simpanPanel()">
+
+    💾 Simpan Realisasi
+
+</button>
+<button
+    type="button"
+    class="btn-kembali"
+    onclick="tutupPanelInput()">
+
+    ← Kembali ke Daftar
+
+</button>
+
+
+<p style="
+    text-align:center;
+    color:#999;
+">
+
+    Silakan klik tombol
+    <b>Kelola</b>
+    pada tabel.
+
+
+</div> <!-- tutup panelInput -->
+
+</div> <!-- tutup realisasi-container -->
+
+</div> <!-- tutup realisasiTriwulan -->
+<!-- ================= MODAL KELOLA REALISASI ================= -->
+<div id="modalKelola" class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>📊 Input Realisasi Triwulan</h2>
+
+            <span class="close" onclick="tutupKelola()">&times;</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= END MENU PERENCANAAN ================= -->
+</div>
+
+
+<!-- ================= MONITORING ================= -->
+
+<div
+    id="monitoring"
+    style="display:none;">
+    <h1>📊 Monitoring Realisasi</h1>
+
+    <table id="tabelMonitoring">
+
+        <thead>
+            <tr>
+
+                <th>No</th>
+                <th>Program</th>
+                <th>Kegiatan</th>
+                <th>Sub Kegiatan</th>
+                <th>Pagu</th>
+
+                <th>TW I</th>
+                <th>TW II</th>
+                <th>TW III</th>
+                <th>TW IV</th>
+
+                <th>Status</th>
+                <th>Detail</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+        </tbody>
+
+    </table>
+
+</div>
+<div id="laporan" style="display:none;">
+
+
+    <h1>📑 Laporan Triwulan SIPANDAKU</h1>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Program</h3>
+           <h1 id="lapProgram">0</h1>
+        </div>
+
+        <div class="card">
+            <h3>Total Anggaran</h3>
+           <h1 id="lapAnggaran">Rp 0</h1>
+        </div>
+
+        <div class="card">
+            <h3>Rata-rata Realisasi</h3>
+            <h1 id="lapRealisasi">0%</h1>
+        </div>
+
+    </div>
+
+    <table id="tabelLaporan">
+
+        <thead>
+            <tr>
+                <th>Program</th>
+                <th>Kegiatan</th>
+                <th>Anggaran</th>
+                <th>Realisasi</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+
+    </table>
+
+    <br>
+
+ <button onclick="cetakPDF()">
+    📄 Cetak Laporan PDF
+</button>
+
+<button onclick="cetakPDF()">
+    📄 Cetak Laporan Resmi
+</button>
+
+</div>
+<div id="dokumen" style="display:none;">
+
+<h1>📂 Arsip Dokumen Digital</h1>
+
+<select id="jenisDokumen">
+
+<option>Renja</option>
+<option>RKA</option>
+<option>DPA</option>
+<option>LKJIP</option>
+<option>LPPD</option>
+<option>Laporan Triwulan</option>
+
+</select>
+
+<input
+type="file"
+id="uploadDokumen">
+
+<button onclick="uploadDokumen()">
+
+📤 Upload Dokumen
+
+</button>
+
+<table id="tabelDokumen">
+
+<thead>
+
+<tr>
+
+    <th>No</th>
+
+    <th>Jenis Dokumen</th>
+
+    <th>Nama File</th>
+
+    <th>Aksi</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+</div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="script.js"></script>
+
+<div id="modalMonitoring" class="modal">
+
+    <div class="modal-content">
+
+        <span class="close" onclick="tutupMonitoring()">&times;</span>
+
+        <h2>📊 Detail Monitoring</h2>
+
+        <div id="isiMonitoring"></div>
+
+    </div>
+
+</div>
+</body>
+</html>

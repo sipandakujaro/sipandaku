@@ -1703,3 +1703,25 @@ align-items:center;
 .detail-table tr:last-child td {
     border-bottom: none;
 }
+.status-badge{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.status-badge.selesai{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.status-badge.berjalan{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.status-badge.belum{
+    background:#fee2e2;
+    color:#991b1b;
+}
