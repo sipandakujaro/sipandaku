@@ -4318,12 +4318,43 @@ async function ambilDataCloud(){
                     Number(sheet[i][20] || 0),
 
 
-                // =================================
-                // PERTAHANKAN URAIAN LOKAL
-                // =================================
+               // =================================
+// AMBIL URAIAN DARI GOOGLE SHEET
+// KOLOM V = INDEX 21
+// =================================
 
-                uraian:
-                    dataLokalItem?.uraian || [],
+uraian: (() => {
+
+    const uraianCloud =
+        sheet[i][21];
+
+    if(
+        uraianCloud &&
+        typeof uraianCloud === "string"
+    ){
+
+        try{
+
+            return JSON.parse(
+                uraianCloud
+            );
+
+        }catch(error){
+
+            console.warn(
+                "Uraian Cloud tidak valid:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // fallback ke data lokal
+    return dataLokalItem?.uraian || [];
+
+})(),
 
 
                 // =================================
